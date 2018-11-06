@@ -3,17 +3,17 @@
 
 """
     Usage:
-        ./3d_transcription_map [--genome_coordinates FILE] [--transcriptomics FILE]
+        ./3d_transcription_map [--gene_coordinates FILE] [--gene_expression FILE]
                                   [--nb_bins INT] [--output PATH]
 
     Options:
-        -h, --help                              Show this.
-        -coord FILE, --genome_coordinates FILE  Path to the file containing informations
-                                                about genome coordinates.
-                                                [default: data/SCHIZONTS.genes_pos.txt]
-        -transpt FILE, --transcriptomics FILE   Path to the file containing informations
-                                                about genes activity.
-                                                [default: data/profiles_Otto2010.min]
+        -h, --help                            Show this.
+        -coord FILE, --gene_coordinates FILE  Path to the file containing informations
+                                              about 3D coordinates of the genes.
+                                              [default: data/SCHIZONTS.genes_pos.txt]
+        -exp FILE, --gene_expression FILE     Path to the file containing the gene expression
+                                              values in different conditions.
+                                              [default: data/profiles_Otto2010.min]
         -n INT, --nb_bins INT                   Indicates the number of bins nearby
                                                 to take into account.
                                                 [default: 1]
@@ -25,22 +25,22 @@
 # Third-party modules
 from docopt import docopt
 from schema import Schema, And, Use, SchemaError
+import numpy as np
+
+# Local modules
+import src.parsing as parsing
+import src.calculation as calculation
+
 
 def check_args():
     """
         Checks and validates the types of inputs parsed by docopt from command line.
-
-        Args:
-            void
-
-        Returns:
-            void
     """
     schema = Schema({
-        '--genome_coordinates': Use(open, error='GENOME COORDINATES file should be readable.'),
-        '--transcriptomics': Use(open, error='TRANSCRIPTOMICS file should be readable.'),
+        '--gene_coordinates': Use(open, error='GENOME COORDINATES file should be readable.'),
+        '--gene_expression': Use(open, error='TRANSCRIPTOMICS file should be readable.'),
         '--nb_bins': And(Use(int), lambda n: 0 <= n <= 100,\
-                                error='--nb_bins should be integer 0 <= N <= 100'),
+                                error='--nb_bins should be integer 0 <= N <= 100.'),
         # The output PATH is created (if not exists) at the end of the program
         # so we skip the check.
         object: object})
@@ -59,7 +59,17 @@ if __name__ == "__main__":
     # Check the types and ranges of the command line arguments parsed by docopt
     check_args()
 
-    GENOME_COORDINATES_FILE = ARGUMENTS["--genome_coordinates"]
-    TRANSCRIPTOMICS_FILE = ARGUMENTS["--transcriptomics"]
+    GENE_COORDINATES_FILE = ARGUMENTS["--gene_coordinates"]
+    GENE_EXPRESSION_FILE = ARGUMENTS["--gene_expression"]
     NB_BINS = int(ARGUMENTS["--nb_bins"])
     OUTPUT_PATH = ARGUMENTS["--output"]
+
+
+    ### Parse data files
+    ####################
+    GENES = parsing.parse_gene_coordinates(GENE_COORDINATES_FILE)
+
+
+    ### Main calculations
+    #####################
+    DISTANCES_MATRIX = calculation.calculate_distances_matrix(GENES)
