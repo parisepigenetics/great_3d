@@ -4,32 +4,40 @@
 """
     Usage:
         ./3d_transcription_map [--gene_coordinates FILE] [--gene_expression FILE]
-                                  [--nb_bins INT] [--output PATH]
+                               [--nb_close_genes INT] [--output PATH] [--cpu INT]
 
     Options:
-        -h, --help                            Show this.
-        -coord FILE, --gene_coordinates FILE  Path to the file containing informations
-                                              about 3D coordinates of the genes.
-                                              [default: data/SCHIZONTS.genes_pos.txt]
-        -exp FILE, --gene_expression FILE     Path to the file containing the gene expression
-                                              values in different conditions.
-                                              [default: data/profiles_Otto2010.min]
-        -n INT, --nb_bins INT                   Indicates the number of bins nearby
-                                                to take into account.
-                                                [default: 1]
-        -o PATH, --output PATH                  Path to the directory containing
-                                                the result files (scores and pdb).
-                                                [default: res]
+        -h, --help                          Show this.
+        -c FILE, --gene_coordinates FILE    Path to the file containing informations
+                                            about 3D coordinates of the genes.
+                                            [default: data/toy_ex_coord.txt]
+        -e FILE, --gene_expression FILE     Path to the file containing the gene expression
+                                            values in different conditions.
+                                            [default: data/toy_ex_profiles.txt]
+        -n INT, --nb_close_genes INT        Indicates the number of genes nearby
+                                            to take into account.
+                                            [default: 10]
+        -o PATH, --output PATH              Path to the directory containing
+                                            the result files (scores and pdb).
+                                            [default: res]
+        -p INT, --cpu INT                   Number of cpus to use for parallelisation
+                                            [default: 2]                                            
 """
 
 # Third-party modules
+import os
+from multiprocessing import Pool, cpu_count
+from functools import partial
+from datetime import datetime
+from tqdm import tqdm
 from docopt import docopt
 from schema import Schema, And, Use, SchemaError
+import pandas as pd
 import numpy as np
 
 # Local modules
-import src.parsing as parsing
 import src.calculation as calculation
+import src.visualization as visualization
 
 
 def check_args():
@@ -37,10 +45,12 @@ def check_args():
         Checks and validates the types of inputs parsed by docopt from command line.
     """
     schema = Schema({
-        '--gene_coordinates': Use(open, error='GENOME COORDINATES file should be readable.'),
-        '--gene_expression': Use(open, error='TRANSCRIPTOMICS file should be readable.'),
-        '--nb_bins': And(Use(int), lambda n: 0 <= n <= 100,\
-                                error='--nb_bins should be integer 0 <= N <= 100.'),
+        '--gene_coordinates': Use(open, error='Gene coordinates file should be readable.'),
+        '--gene_expression': Use(open, error='Gene expression file should be readable.'),
+        '--nb_close_genes': And(Use(int), lambda n: 0 <= n <= 100,\
+                            error='--nb_close_genes should be integer 0 <= N <= 100.'),
+        '--cpu': And(Use(int), lambda n: 1 <= n <= cpu_count(),\
+                                error='--cpus=NUM should be integer 1 <= N <= ' + str(cpu_count())),        
         # The output PATH is created (if not exists) at the end of the program
         # so we skip the check.
         object: object})
@@ -51,7 +61,6 @@ def check_args():
 
 if __name__ == "__main__":
 
-
     ### Parse command line
     ######################
     ARGUMENTS = docopt(__doc__, version='3d_transcription_map 1.0')
@@ -61,15 +70,31 @@ if __name__ == "__main__":
 
     GENE_COORDINATES_FILE = ARGUMENTS["--gene_coordinates"]
     GENE_EXPRESSION_FILE = ARGUMENTS["--gene_expression"]
-    NB_BINS = int(ARGUMENTS["--nb_bins"])
+    NB_CLOSE_GENES = int(ARGUMENTS["--nb_close_genes"])
     OUTPUT_PATH = ARGUMENTS["--output"]
+    # Number of cpus for parallelisation
+    NB_PROC = int(ARGUMENTS["--cpu"])    
 
 
-    ### Parse data files
-    ####################
-    GENES = parsing.parse_gene_coordinates(GENE_COORDINATES_FILE)
+    ### Data frames
+    ###############
+    COORDINATES = pd.read_csv(GENE_COORDINATES_FILE, sep='\t')
+    EXPRESSIONS = pd.read_csv(GENE_EXPRESSION_FILE, sep='\t')
+    CORRELATIONS = EXPRESSIONS.transpose().corr(method="spearman")
+    print('correlations done')
 
 
     ### Main calculations
     #####################
-    DISTANCES_MATRIX = calculation.calculate_distances_matrix(GENES)
+    # Parallelization of the main loop
+    with Pool(processes=NB_PROC) as pool:
+        FUNC = partial(calculation.calculate_transcription_map, COORDINATES, CORRELATIONS, NB_CLOSE_GENES)
+        os.system("clear")
+        print("\n" + str(cpu_count()) + " cpus detected, using " + str(NB_PROC))
+        print("\n\nProcessing ...\n")
+        TRANSCRIPTION_MAP = [gene for gene in tqdm(pool.imap_unordered(FUNC, COORDINATES.index),
+                             total=len(COORDINATES.index))]
+
+    ### 3D plot
+    ###########
+    visualization.visualize_4d_genome(TRANSCRIPTION_MAP, COORDINATES)
