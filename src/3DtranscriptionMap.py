@@ -1,8 +1,8 @@
- #!/usr/bin/env python3
+#!/usr/bin/env python3
 
 import pandas
 import argparse
-from pathlib import Path
+import FileManager
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description="3D transcription map, main file")
@@ -13,10 +13,17 @@ if __name__ == '__main__':
 
     args = parser.parse_args()
 
-    GENE_3D_POS = Path(args.gene3Dpos)
-    GENE_EXPRESSION = Path(args.geneTrasncriptionTable)
-    if GENE_3D_POS.is_file():
-        data_frame_3d_pos = pandas.read_table(GENE_3D_POS, header=0)
-    if GENE_EXPRESSION.is_file():
-        data_frame_gene_expression = pandas.read_table(GENE_EXPRESSION, header=0)
-        print(data_frame_gene_expression.head())
+
+    GENE_3D_POS = FileManager.checkFile(args.gene3Dpos)
+    GENE_EXPRESSION = FileManager.checkFile(args.geneTranscriptionTable)
+    DF_3DPOS = pandas.read_table(GENE_3D_POS, header=0)
+    DF_GENE_EXPR = pandas.read_table(GENE_EXPRESSION, header=0)
+    gene_in_3DPOS = list(DF_3DPOS.index)
+    gene_in_EXPR = list(DF_GENE_EXPR)
+    overlap_gene = set(gene_in_EXPR).intersection(gene_in_3DPOS)
+    DF_3DPOS = DF_3DPOS.loc[list(overlap_gene)]
+    DF_GENE_EXPR = DF_GENE_EXPR.loc[list(overlap_gene)]
+    # DF_GENE_EXPR = DF_GENE_EXPR.transpose().corr(method="spearman")
+    # c=expr.loc[list(inter)[:10]].transpose().corr(method="spearman")
+    # pandas.DataFrame.as_matrix??
+    # numpy.corrcoeff???
