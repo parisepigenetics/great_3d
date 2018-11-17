@@ -25,7 +25,7 @@ if __name__ == '__main__':
     OVERLAP_GENE = set(GENE_IN_EXPR).intersection(GENE_IN_3DPOS)
     DF_3DPOS = DF_3DPOS.loc[list(OVERLAP_GENE)]
     DF_GENE_EXPR = DF_GENE_EXPR.loc[list(OVERLAP_GENE)]
-    DF_CORR = pandas.read_pickle("corr.pckl")
+    # DF_CORR = pandas.read_pickle("corr.pckl")
     # DF_GENE_EXPR = DF_GENE_EXPR.transpose().corr(method="spearman")
     DF_DIST = pandas.DataFrame(data=squareform(pdist(DF_3DPOS.drop('chr', 1),
                                                      metric="euclidean")),
