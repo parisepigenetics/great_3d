@@ -3,7 +3,7 @@
 
 import argparse
 import pandas
-from scipy.spatial.distance import squareform, pdist
+from scipy.spatial.distance import squareform, pdist, spearmanr
 import file_manager
 
 if __name__ == '__main__':
@@ -31,3 +31,4 @@ if __name__ == '__main__':
                                                      metric="euclidean")),
                                index=DF_3DPOS.index,
                                columns=DF_3DPOS.index)
+    
