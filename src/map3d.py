@@ -2,8 +2,9 @@
 """Program to print a 3D map"""
 
 import argparse
+import subprocess
 import pandas
-from scipy.spatial.distance import squareform, pdist, spearmanr
+from scipy.spatial.distance import squareform, pdist
 import file_manager
 
 if __name__ == '__main__':
@@ -25,8 +26,9 @@ if __name__ == '__main__':
     OVERLAP_GENE = set(GENE_IN_EXPR).intersection(GENE_IN_3DPOS)
     DF_3DPOS = DF_3DPOS.loc[list(OVERLAP_GENE)]
     DF_GENE_EXPR = DF_GENE_EXPR.loc[list(OVERLAP_GENE)]
-    # DF_CORR = pandas.read_pickle("corr.pckl")
-    # DF_GENE_EXPR = DF_GENE_EXPR.transpose().corr(method="spearman")
+    DF_GENE_EXPR.to_csv("../data/for_corr.csv", "\t")
+    subprocess.check_call(['Rscript', 'correlation.R'], shell=False)
+    DF_CORR = pandas.read_table("../data/correlation.csv")
     DF_DIST = pandas.DataFrame(data=squareform(pdist(DF_3DPOS.drop('chr', 1),
                                                      metric="euclidean")),
                                index=DF_3DPOS.index,
