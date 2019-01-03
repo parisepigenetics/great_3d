@@ -32,17 +32,20 @@ if __name__ == '__main__':
     DF_3DPOS = DF_3DPOS.loc[list(OVERLAP_GENE)]
     DF_GENE_EXPR = DF_GENE_EXPR.loc[list(OVERLAP_GENE)]
     DF_GENE_EXPR.to_csv("../data/for_corr.csv", "\t")
-    subprocess.check_call(['Rscript', 'correlation.R'], shell=False)
     # called cor R function because it is faster than pandas.corr
+    subprocess.check_call(['Rscript', 'correlation.R'], shell=False)
+    # read the R code result
     DF_CORR = pandas.read_table("../data/correlation.csv")
-    # DF_CORR = pandas.read_pickle("../data/corr.pckl")
     DF_DIST = pandas.DataFrame(data=squareform(pdist(DF_3DPOS.drop('chr', 1),
                                                      metric="euclidean")),
                                index=DF_3DPOS.index,
                                columns=DF_3DPOS.index)
     # caculate the distance matrix
     DIST_LIST = [pandas.DataFrame]*len(DF_DIST)
+    # dictionary with gene name for key and list of N closer genes for values
     DIST_DIC = {}
+    # dictionary with gene name for key and list[x,y,z,correlation]
+    PLOT_DIC = {}
     for i, val in enumerate(DF_DIST):
         DIST_LIST[i]=DF_DIST.iloc[[i], :]
         tmp_array=DIST_LIST[i].values.argsort() # sorted array 
@@ -55,8 +58,13 @@ if __name__ == '__main__':
                 count=count - 1
             j+=1
         DIST_DIC[DIST_LIST[i].index[0]]=list(DIST_LIST[i].iloc[:,tmp_index].columns)
+        sum_corr=0
+        for closer_gene in DIST_DIC[DIST_LIST[i].index[0]]:
+            sum_corr = sum_corr + DF_CORR [DIST_LIST[i].index[0]][closer_gene]
+        coord=DF_3DPOS.loc[DIST_LIST[i].index[0]].values[1:]
+        PLOT_DIC[DIST_LIST[i].index[0]]=[coord[0], coord[1], coord[2], sum_corr]
 
-    print(DIST_DIC)
+    print(PLOT_DIC)
     print(time.time() - START)
 
 
