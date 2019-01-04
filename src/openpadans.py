@@ -23,7 +23,7 @@ def overlaping_genes (position_data_frame, expression_data_frame):
     """
     
     """
-    return position_data_frame.intersection(expression_data_frame)
+    return expression_data_frame.intersection(position_data_frame)
 
 
 
@@ -43,4 +43,8 @@ if __name__ == "__main__":
     print(GENE_EXP)
 
     overr=overlaping_genes(GENE_POS.index, GENE_EXP.index)
+    overr=overr.tolist()
+    print(type(overr))
     print(len(overr))
+    for i in overr :
+        print(GENE_POS.loc[i,].tolist())
