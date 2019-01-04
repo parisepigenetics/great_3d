@@ -22,6 +22,7 @@ if __name__ == '__main__':
                         help='path to the file contains expression of genes')
     PARSER.add_argument('NCloserGenes', type=int,
                         help='number of closer genes to take')
+    PARSER.add_argument('colorMap', type=str, help="color map for plot")
     ARGS = PARSER.parse_args()
     GENE_3D_POS = file_manager.check_file(ARGS.gene3Dpos)
     GENE_EXPRESSION = file_manager.check_file(ARGS.geneTranscriptionTable)
@@ -80,7 +81,7 @@ if __name__ == '__main__':
         YS[i] = PLOT_DIC[gene][1]
         ZS[i] = PLOT_DIC[gene][2]
         COLOR[i] = PLOT_DIC[gene][3]
-    P = AX.scatter(XS, YS, ZS, c=COLOR, cmap="spring", marker="o")
+    P = AX.scatter(XS, YS, ZS, c=COLOR, cmap=ARGS.colorMap, marker="o")
     AX.set_xlabel('X Label')
     AX.set_ylabel('Y Label')
     AX.set_zlabel('Z Label')
