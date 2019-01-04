@@ -11,11 +11,20 @@ def gene_position (position_file):
     """
     return pd.read_csv(position_file, delim_whitespace = True)
 
+
 def gene_expression (expression_file):
     """
 
     """
     return pd.read_csv(expression_file, delim_whitespace = True)
+
+
+def overlaping_genes (position_data_frame, expression_data_frame):
+    """
+    
+    """
+    return position_data_frame.intersection(expression_data_frame)
+
 
 
 if __name__ == "__main__":
@@ -32,3 +41,6 @@ if __name__ == "__main__":
 
     GENE_EXP = gene_expression(EXP_FILE)
     print(GENE_EXP)
+
+    overr=overlaping_genes(GENE_POS.index, GENE_EXP.index)
+    print(len(overr))
