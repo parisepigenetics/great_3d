@@ -4,6 +4,7 @@ Genes position and expression files Parsing
 """
 import argparse
 import pandas as pd
+import scipy.spatial
 
 def gene_position (position_file):
     """
@@ -26,6 +27,12 @@ def overlaping_genes (position_data_frame, expression_data_frame):
     return expression_data_frame.intersection(position_data_frame)
 
 
+def distance_matrix (position_data_frame):
+    """
+    
+    """
+    return scipy.spatial.distance.cdist(position_data_frame, position_data_frame, metric='euclidean')
+
 
 if __name__ == "__main__":
 
@@ -37,14 +44,18 @@ if __name__ == "__main__":
     EXP_FILE = ARGS.exp_file
     
     GENE_POS = gene_position(POS_FILE)
-    print(GENE_POS)
+    #print(GENE_POS)
 
     GENE_EXP = gene_expression(EXP_FILE)
-    print(GENE_EXP)
+    #print(GENE_EXP)
 
     overr=overlaping_genes(GENE_POS.index, GENE_EXP.index)
     overr=overr.tolist()
-    print(type(overr))
-    print(len(overr))
-    for i in overr :
-        print(GENE_POS.loc[i,].tolist())
+    #print(len(overr))
+    #for i in overr :
+    #    print(GENE_POS.loc[i,].tolist())
+
+    GEN_POS = pd.DataFrame(GENE_POS.loc[overr])
+    GENE_EXP = pd.DataFrame(GENE_EXP.loc[overr])
+
+    print(distance_matrix(GEN_POS[['X','Y','Z']]))
