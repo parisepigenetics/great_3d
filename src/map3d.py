@@ -99,3 +99,4 @@ if __name__ == '__main__':
 # 5/ Plot des coordonnées avec en couleur le chiffre X
 # tester le NaN
 # errors catcher
+# ajouer label des points, titre graphe, meilleures différences dans les couleurs.
