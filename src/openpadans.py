@@ -34,6 +34,13 @@ def distance_matrix (position_data_frame):
     return scipy.spatial.distance.cdist(position_data_frame, position_data_frame, metric='euclidean')
 
 
+def correlation_matrix (expression_data_frame):
+    """
+    
+    """
+    return expression_data_frame.corr(method = 'spearman')
+
+
 if __name__ == "__main__":
 
     PARSER = argparse.ArgumentParser()
@@ -58,4 +65,9 @@ if __name__ == "__main__":
     GEN_POS = pd.DataFrame(GENE_POS.loc[overr])
     GENE_EXP = pd.DataFrame(GENE_EXP.loc[overr])
 
-    print(distance_matrix(GEN_POS[['X','Y','Z']]))
+    DIST_MATRIX = pd.DataFrame(distance_matrix(GEN_POS[['X','Y','Z']]))
+    DIST_MATRIX.index = GEN_POS.index
+    DIST_MATRIX.columns = GEN_POS.index
+    print(DIST_MATRIX)
+
+    print(correlation_matrix(GENE_EXP))
