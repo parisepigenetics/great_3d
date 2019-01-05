@@ -32,7 +32,7 @@ Two input data files are required to run the program :
 This script is used to read the data files and turn them into pandas data frames, it also gives the overlapping genes between the two files.
 
 #### distcorr.py
-This script is used to create the distance matrix out of the gene positions data frame and the correlation matrix out of the gene expression data frame, also used to get the sum of the correlations of the close genes for each gene.
+This script is used to create the distance matrix out of the gene positions data frame and the correlation matrix out of the gene expression data frame, also used to get the sum of the correlations of the closest genes for each gene.
 
 #### visual.py 
 This script is used to get a 3D visual of the correlation between the genome organisation and the gene expression.
@@ -56,7 +56,7 @@ $python3 main.py gene_position_file gene_expression_file nbr_of_close_genes
 
 
 ### Exemple of usage :
-If you are on the 3D_transmap_Meraouna repository you can type the following command line to run the programm on *plasmodium falciparum* with a selection a the 10 closest genes :
+If you are on the 3D_transmap_Meraouna repository you can type the following command line to run the programm on *plasmodium falciparum* with a selection of the 10 closest genes :
 ```shell
 $python3 src/main.py data/SCHIZONTS.genes_pos.txt data/profiles_Otto2010_copy.min 10 
 ```
