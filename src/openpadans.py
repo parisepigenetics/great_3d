@@ -10,6 +10,8 @@ from functools import partial
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
 from os import makedirs, path
+import ploting as pltg
+import numpy as np
 
 
 def gene_position (position_file):
@@ -73,13 +75,68 @@ def visualisation_3d (data_frame, file_name):
     """
     """
     visual = plt.figure().gca(projection='3d')
+
     visual.scatter(data_frame['X'], data_frame['Y'], data_frame['Z'], c = data_frame['sum_corr'], cmap="jet") #jet blue -> red
     visual.set_xlabel('X')
     visual.set_ylabel('Y')
     visual.set_zlabel('Z')
+
     plt.savefig("result/"+file_name+"_fig.pdf")
     plt.show()
 
+######################################################  2D
+
+    names = np.array(data_frame.index.tolist())
+    x = np.array(data_frame['X'].values)
+    #print(" x values : ", x[1])
+    y = np.array(data_frame['Y'].values)
+    c = np.array(data_frame['sum_corr'].values)
+
+    norm = plt.Normalize(1,4)
+    cmap = plt.cm.jet
+
+    fig,ax = plt.subplots()
+    sc = plt.scatter(x,y,c=c, s=100, cmap="jet")
+
+    annot = ax.annotate("", xy=(0,0), xytext=(20,20),textcoords="offset points",
+                        bbox=dict(boxstyle="round", fc="w"),
+                        arrowprops=dict(arrowstyle="->"))
+    annot.set_visible(False)
+
+    def update_annot(ind):
+
+        pos = sc.get_offsets()[ind["ind"][0]]
+        annot.xy = pos
+        text = ""
+        if (len(ind["ind"]) > 1):
+            for n in ind["ind"] :
+                text = text+" "+names[n]
+        else :
+            text = names[ind["ind"]]#"{}, {}".format(" ".join(list(map(str,ind["ind"]))), 
+                #               " ".join([names[n:,0] for n in ind["ind"]]))
+        annot.set_text(text)
+        annot.get_bbox_patch().set_facecolor(cmap(norm(c[ind["ind"][0]])))
+        annot.get_bbox_patch().set_alpha(0.4)
+
+
+    def hover(event):
+        vis = annot.get_visible()
+        if event.inaxes == ax:
+            cont, ind = sc.contains(event)
+            if cont:
+                update_annot(ind)
+                annot.set_visible(True)
+                fig.canvas.draw_idle()
+            else:
+                if vis:
+                    annot.set_visible(False)
+                    fig.canvas.draw_idle()
+
+    fig.canvas.mpl_connect("motion_notify_event", hover)
+
+    plt.show()
+
+    #pltg.visualize3DData(data_frame.reset_index().values)
 
 
 
@@ -117,9 +174,12 @@ if __name__ == "__main__":
     DIST_MATRIX = pd.DataFrame(distance_matrix(GEN_POS[['X','Y','Z']]))
     DIST_MATRIX.index = GEN_POS.index
     DIST_MATRIX.columns = GEN_POS.index
+    print("dist matrix :")
     print(DIST_MATRIX)
 
     CORR_MATRIX = correlation_matrix(GENE_EXP.transpose())
+    print("corr matrix :")
+    print(CORR_MATRIX)
 
 
     #dic = {}
@@ -134,9 +194,11 @@ if __name__ == "__main__":
 
     SUM_CORR = pd.DataFrame([SUM_CORR], columns=SUM_CORR.keys())
     SUM_CORR.rename(index = {0: "sum_corr"}, inplace = True)
+    print("sum corr matrix :")
     print(SUM_CORR)
 
     TRANSMAP3D = SUM_CORR.transpose().join(GEN_POS[['X','Y','Z']], how='outer')
+    print("transmap 3d matrix :")
     print(TRANSMAP3D)
 
     if not path.exists("result"):
