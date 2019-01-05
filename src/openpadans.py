@@ -7,6 +7,8 @@ import pandas as pd
 import scipy.spatial
 import multiprocessing as mp
 from functools import partial
+import matplotlib.pyplot as plt
+from mpl_toolkits.mplot3d import Axes3D
 
 
 def gene_position (position_file):
@@ -65,6 +67,16 @@ def close_genes_correlation (dict_matrix, corr_matrix, nbr_gen, overr):
         gene3Dcorr = abs(corr_matrix.loc[gene,closeGenes].sum())
         SUM_CORR[gene]=gene3Dcorr
     return(SUM_CORR)
+
+def visualisation_3d (data_frame):
+    """
+    """
+    visual = plt.figure().gca(projection='3d')
+    visual.scatter(data_frame['X'], data_frame['Y'], data_frame['Z'])
+    visual.set_xlabel('X')
+    visual.set_ylabel('Y')
+    visual.set_zlabel('Z')
+    plt.show()
 
 
 
@@ -125,3 +137,4 @@ if __name__ == "__main__":
     TRANSMAP3D = SUM_CORR.transpose().join(GEN_POS[['X','Y','Z']], how='outer')
     print(TRANSMAP3D)
 
+    visualisation_3d (TRANSMAP3D)
