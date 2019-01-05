@@ -44,16 +44,28 @@ def correlation_matrix (expression_data_frame):
     return expression_data_frame.corr(method = 'spearman')
 
 
-def close_genes_correlation (list_data_nbr, gene_name):
-    """
+#def close_genes_correlation (list_data_nbr, gene_name):
+    #"""
 
-    """
-    closeGenes = list_data_nbr[0].loc[gene_name,].sort_values()[1:list_data_nbr[2]+1].index.tolist()
-    gene3Dcorr = abs(list_data_nbr[1].loc[gene_name,closeGenes].sum())
+    #"""
+    #closeGenes = list_data_nbr[0].loc[gene_name,].sort_values()[1:list_data_nbr[2]+1].index.tolist()
+    #gene3Dcorr = abs(list_data_nbr[1].loc[gene_name,closeGenes].sum())
     #dataframe.loc[row,col]
     #list[0]=dis  list[1]=corr  list[2]=n
-    list_data_nbr[-1][gene_name]=gene3Dcorr
-    return(list_data_nbr[-1])
+    #list_data_nbr[-1][gene_name]=gene3Dcorr
+    #return(list_data_nbr[-1])
+
+
+def close_genes_correlation (dict_matrix, corr_matrix, nbr_gen, overr):
+    """
+    """
+    transMap3D = {}
+    for gene in overr :
+        closeGenes = dict_matrix.loc[gene,].sort_values()[1:nbr_gen+1].index.tolist()
+        gene3Dcorr = abs(corr_matrix.loc[gene,closeGenes].sum())
+        transMap3D[gene]=gene3Dcorr
+    return(transMap3D)
+
 
 
 
@@ -96,18 +108,19 @@ if __name__ == "__main__":
     CORR_MATRIX = correlation_matrix(GENE_EXP.transpose())
 
 
-    dic = {}
+    #dic = {}
 
+    #func = partial(close_genes_correlation, [DIST_MATRIX, CORR_MATRIX, NBR_GEN, dic])
+    #dic = POOL.map(func, overr)
 
-    #print(len(overr))
-    func = partial(close_genes_correlation, [DIST_MATRIX, CORR_MATRIX, NBR_GEN, dic])
-    dic = POOL.map(func, overr)
+    #dic = dic [0]
+    #dic2 = pd.DataFrame([dic], columns=dic.keys())
 
-    #print(len(dic))
-    dic = dic [0]
-    #print(type(dic))
-    dic2 = pd.DataFrame([dic], columns=dic.keys())
-    print(dic2)
-    #dic2 = pd.DataFrame.from_dict(dic, orient='index')
-    #print(dic2)
+    transmap3D = close_genes_correlation (DIST_MATRIX, CORR_MATRIX, NBR_GEN, overr)
+    transmap3D = pd.DataFrame([transmap3D], columns=transmap3D.keys())
+    transmap3D.rename(index = {0: "sum_corr"}, inplace = True)
+    print(transmap3D)
+
+    newData = transmap3D.transpose().join(GEN_POS[['X','Y','Z']], how='outer')
+    print(newData)
 
