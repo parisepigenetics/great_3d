@@ -59,12 +59,12 @@ def correlation_matrix (expression_data_frame):
 def close_genes_correlation (dict_matrix, corr_matrix, nbr_gen, overr):
     """
     """
-    transMap3D = {}
+    SUM_CORR = {}
     for gene in overr :
         closeGenes = dict_matrix.loc[gene,].sort_values()[1:nbr_gen+1].index.tolist()
         gene3Dcorr = abs(corr_matrix.loc[gene,closeGenes].sum())
-        transMap3D[gene]=gene3Dcorr
-    return(transMap3D)
+        SUM_CORR[gene]=gene3Dcorr
+    return(SUM_CORR)
 
 
 
@@ -75,7 +75,7 @@ if __name__ == "__main__":
     PARSER = argparse.ArgumentParser()
     PARSER.add_argument("pos_file", help="the file containing the x y z coordinates of the genes", type=str)
     PARSER.add_argument("exp_file", help="the file containing the genes expression data", type=str)
-    PARSER.add_argument("nbr_genes", help="the number of close genes", type=int)
+    PARSER.add_argument("nbr_genes", help="the number of close genes to select", type=int)
     ARGS = PARSER.parse_args()
     POS_FILE = ARGS.pos_file
     EXP_FILE = ARGS.exp_file
@@ -116,11 +116,12 @@ if __name__ == "__main__":
     #dic = dic [0]
     #dic2 = pd.DataFrame([dic], columns=dic.keys())
 
-    transmap3D = close_genes_correlation (DIST_MATRIX, CORR_MATRIX, NBR_GEN, overr)
-    transmap3D = pd.DataFrame([transmap3D], columns=transmap3D.keys())
-    transmap3D.rename(index = {0: "sum_corr"}, inplace = True)
-    print(transmap3D)
+    SUM_CORR = close_genes_correlation (DIST_MATRIX, CORR_MATRIX, NBR_GEN, overr)
 
-    newData = transmap3D.transpose().join(GEN_POS[['X','Y','Z']], how='outer')
-    print(newData)
+    SUM_CORR = pd.DataFrame([SUM_CORR], columns=SUM_CORR.keys())
+    SUM_CORR.rename(index = {0: "sum_corr"}, inplace = True)
+    print(SUM_CORR)
+
+    TRANSMAP3D = SUM_CORR.transpose().join(GEN_POS[['X','Y','Z']], how='outer')
+    print(TRANSMAP3D)
 
