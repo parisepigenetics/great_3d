@@ -68,14 +68,15 @@ def close_genes_correlation (dict_matrix, corr_matrix, nbr_gen, overr):
         SUM_CORR[gene]=gene3Dcorr
     return(SUM_CORR)
 
-def visualisation_3d (data_frame):
+def visualisation_3d (data_frame, file_name):
     """
     """
     visual = plt.figure().gca(projection='3d')
-    visual.scatter(data_frame['X'], data_frame['Y'], data_frame['Z'], c = data_frame['sum_corr'])
+    visual.scatter(data_frame['X'], data_frame['Y'], data_frame['Z'], c = data_frame['sum_corr'], cmap="jet") #jet blue -> red
     visual.set_xlabel('X')
     visual.set_ylabel('Y')
     visual.set_zlabel('Z')
+    plt.savefig("result/"+file_name+"_fig.pdf")
     plt.show()
 
 
@@ -137,4 +138,4 @@ if __name__ == "__main__":
     TRANSMAP3D = SUM_CORR.transpose().join(GEN_POS[['X','Y','Z']], how='outer')
     print(TRANSMAP3D)
 
-    visualisation_3d (TRANSMAP3D)
+    visualisation_3d (TRANSMAP3D, EXP_FILE.split("/")[-1].split(".")[0])
