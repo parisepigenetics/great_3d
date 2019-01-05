@@ -74,36 +74,18 @@ def close_genes_correlation (dict_matrix, corr_matrix, nbr_gen, overr):
 def visualisation_3d (data_frame, file_name):
     """
     """
-    visual = plt.figure().gca(projection='3d')
-
-    visual.scatter(data_frame['X'], data_frame['Y'], data_frame['Z'], c = data_frame['sum_corr'], cmap="jet") #jet blue -> red
-    visual.set_xlabel('X')
-    visual.set_ylabel('Y')
-    visual.set_zlabel('Z')
-
-    plt.savefig("result/"+file_name+"_fig.pdf")
-    plt.show()
-
-######################################################  2D
-
     names = np.array(data_frame.index.tolist())
     x = np.array(data_frame['X'].values)
-    #print(" x values : ", x[1])
     y = np.array(data_frame['Y'].values)
-    c = np.array(data_frame['sum_corr'].values)
-
     z = np.array(data_frame['Z'].values)
+    c = np.array(data_frame['sum_corr'].values)
 
     norm = plt.Normalize(1,4)
     cmap = plt.cm.jet
 
-    #fig,ax = plt.subplots()
-    #sc = plt.scatter(x,y,c=c, s=100, cmap="jet")
-
     fig = plt.figure(figsize = (16,10))
     ax = fig.add_subplot(111, projection = '3d')
     sc = ax.scatter(x, y, z, c=c, cmap="jet", depthshade = False, picker = True)
-
 
     annot = ax.annotate("", xy=(0,0), xytext=(20,20),textcoords="offset points",
                         bbox=dict(boxstyle="round", fc="w"),
@@ -117,13 +99,12 @@ def visualisation_3d (data_frame, file_name):
         text = ""
         if (len(ind["ind"]) > 1):
             for n in ind["ind"] :
-                text = text+" "+names[n]
+                text = text+" "+"['"+names[n]+"']"
         else :
             text = names[ind["ind"]]
 
         annot.set_text(text)
         annot.get_bbox_patch().set_facecolor(cmap(c[ind["ind"][0]]))
-
 
     def hover(event):
         vis = annot.get_visible()
@@ -139,10 +120,10 @@ def visualisation_3d (data_frame, file_name):
                     fig.canvas.draw_idle()
 
     fig.canvas.mpl_connect("motion_notify_event", hover)
-
+    
+    plt.savefig("result/"+file_name+"_fig.pdf")
     plt.show()
 
-    #pltg.visualize3DData(data_frame.reset_index().values)
 
 
 
