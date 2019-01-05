@@ -92,15 +92,22 @@ def visualisation_3d (data_frame, file_name):
     y = np.array(data_frame['Y'].values)
     c = np.array(data_frame['sum_corr'].values)
 
+    z = np.array(data_frame['Z'].values)
+
     norm = plt.Normalize(1,4)
     cmap = plt.cm.jet
 
-    fig,ax = plt.subplots()
-    sc = plt.scatter(x,y,c=c, s=100, cmap="jet")
+    #fig,ax = plt.subplots()
+    #sc = plt.scatter(x,y,c=c, s=100, cmap="jet")
+
+    fig = plt.figure(figsize = (16,10))
+    ax = fig.add_subplot(111, projection = '3d')
+    sc = ax.scatter(x, y, z, c=c, cmap="jet", depthshade = False, picker = True)
+
 
     annot = ax.annotate("", xy=(0,0), xytext=(20,20),textcoords="offset points",
                         bbox=dict(boxstyle="round", fc="w"),
-                        arrowprops=dict(arrowstyle="->"))
+                        arrowprops=dict(arrowstyle="-|>"))
     annot.set_visible(False)
 
     def update_annot(ind):
@@ -112,11 +119,10 @@ def visualisation_3d (data_frame, file_name):
             for n in ind["ind"] :
                 text = text+" "+names[n]
         else :
-            text = names[ind["ind"]]#"{}, {}".format(" ".join(list(map(str,ind["ind"]))), 
-                #               " ".join([names[n:,0] for n in ind["ind"]]))
+            text = names[ind["ind"]]
+
         annot.set_text(text)
-        annot.get_bbox_patch().set_facecolor(cmap(norm(c[ind["ind"][0]])))
-        annot.get_bbox_patch().set_alpha(0.4)
+        annot.get_bbox_patch().set_facecolor(cmap(c[ind["ind"][0]]))
 
 
     def hover(event):
