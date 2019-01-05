@@ -9,7 +9,7 @@ Small python program used to analyse the spatial correlations and associations b
 ## Requirements :
 
 ### System :
-* Linux
+* Linux : 
 This program has only been tested on a Linux environment and thus is not guaranteed to work on other ones.
 
 ### Python packages :
