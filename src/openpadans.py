@@ -9,6 +9,7 @@ import multiprocessing as mp
 from functools import partial
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
+from os import makedirs, path
 
 
 def gene_position (position_file):
@@ -137,5 +138,8 @@ if __name__ == "__main__":
 
     TRANSMAP3D = SUM_CORR.transpose().join(GEN_POS[['X','Y','Z']], how='outer')
     print(TRANSMAP3D)
+
+    if not path.exists("result"):
+        makedirs("result")
 
     visualisation_3d (TRANSMAP3D, EXP_FILE.split("/")[-1].split(".")[0])
