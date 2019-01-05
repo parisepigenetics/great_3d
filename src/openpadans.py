@@ -72,7 +72,7 @@ def visualisation_3d (data_frame):
     """
     """
     visual = plt.figure().gca(projection='3d')
-    visual.scatter(data_frame['X'], data_frame['Y'], data_frame['Z'])
+    visual.scatter(data_frame['X'], data_frame['Y'], data_frame['Z'], c = data_frame['sum_corr'])
     visual.set_xlabel('X')
     visual.set_ylabel('Y')
     visual.set_zlabel('Z')
