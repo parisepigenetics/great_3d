@@ -89,10 +89,17 @@ def visualisation_3d (data_frame, file_name):
     ax = fig.add_subplot(111, projection = '3d')
     sc = ax.scatter(x, y, z, c=c, cmap="jet", depthshade = False, picker = True)
 
+    ax.text2D(0.05, 0.95, "3D Transmap of "+file_name, transform=ax.transAxes)
+    ax.set_xlabel('X axis')
+    ax.set_ylabel('Y axis')
+    ax.set_zlabel('Z axis')
+
     annot = ax.annotate("", xy=(0,0), xytext=(20,20),textcoords="offset points",
                         bbox=dict(boxstyle="round", fc="w"),
                         arrowprops=dict(arrowstyle="-|>"))
     annot.set_visible(False)
+
+    fig.colorbar(sc, shrink=0.5, aspect=5)
 
     def update_annot(ind):
 
@@ -123,8 +130,13 @@ def visualisation_3d (data_frame, file_name):
 
     fig.canvas.mpl_connect("motion_notify_event", hover)
     
+    end = time.time()
+    
+
     plt.savefig("result/"+file_name+"_fig.pdf")
     plt.show()
+
+    return(end)
 
 
 def complete_time(start, end):
@@ -210,7 +222,6 @@ if __name__ == "__main__":
     if not path.exists("result"):
         makedirs("result")
 
-    visualisation_3d (TRANSMAP3D, EXP_FILE.split("/")[-1].split(".")[0])
+    END = visualisation_3d (TRANSMAP3D, EXP_FILE.split("/")[-1].split(".")[0])
 
-    END = time.time()
     print("duration of the programm : ", complete_time(START, END))
