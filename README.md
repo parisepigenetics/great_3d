@@ -12,26 +12,26 @@ University of Paris 7
 M2BI
 2018-2019
 
-# Short Description
+## Short Description
 
 This is a program made for a project at the university of Paris 7 in master 2 of bio-informatics.
 This program permits to display a 3D transcription map of a genome.
 
-# Needed libraries
+## Needed libraries
 
 * numpy
 * matplotlib
 * pandas
 * scipy
 
-# Needed Files 
+## Needed Files 
 
 * file_manager.py
 * map3d.py
 * main.py
 * correlation.R
 
-# How to use it
+## How to use it
 
 * make sure you have python3
 * make sure you are in the repository "src" with:
@@ -48,7 +48,7 @@ This program permits to display a 3D transcription map of a genome.
     * python3 map3d.py
     * python3 file_manager.py
 
-# Some examples
+## Some examples
 
 * python3 main.py ../data/SCHIZONTS.genes_pos.txt ../data/profiles_Otto2010.min 7 magma 0.5
     * path_to_3Dpos_file = ../data/SCHIZONTS.genes_pos.txt
@@ -64,7 +64,7 @@ This program permits to display a 3D transcription map of a genome.
     * "mouse click left" = rotate the figure in terms of mouse mouvement
     * "mouse click right" = zoom in terms of mouse mouvement
 
-# Documentation
+## Documentation
 
 * you can read doc with command line: see in "How to use it" with help function. 
 * go to 3DtranscriptionMap/doc/pythonDoc/Doxygen_doc/index.html
