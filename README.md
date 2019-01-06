@@ -15,7 +15,7 @@ M2BI
 # Short Description
 
 This is a program made for a project at the university of Paris 7 in master 2 of bio-informatics.
-This program permit display a 3D transcription map of a genome.
+This program permits to display a 3D transcription map of a genome.
 
 # Needed Files 
 
