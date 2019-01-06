@@ -56,17 +56,9 @@ if __name__ == '__main__':
                                columns=DF_3DPOS.index)
     print("{} secondes to create matrix".format(time.time() - START))
 
+    #build and display the 3D map
     START = time.time()
     TRANSMAP = mp.TranscripMap3D(DF_3DPOS, DF_DIST, DF_CORR)
     TRANSMAP.create_plot_dic(ARGS.NCloserGenes, ARGS.maxDist)
     print("{} secondes to create PLOT_DIC".format(time.time() - START))
     TRANSMAP.display(ARGS.colorMap)
-
-# Tu as un tableau de coordonnées x, y, z et un tableau d'expression des gènes
-# 1/ Il faut calculer la matrice de corrélation (tableau exp des gènes)
-# 2/ calcul des distances avec le tableau des coord
-# 3/ pour un gène donné, sélection des N gènes les plus proches puis tu sommes
-# la correlation des N gènes les plus proches
-# (utiliser la matrice de corrélation) cela te donne un chiffre X
-# 5/ Plot des coordonnées avec en couleur le chiffre X
-# ajouer label des points, save image.

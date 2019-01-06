@@ -20,6 +20,7 @@ class TranscripMap3D:
         self.df_dist = DistMatrix
         self.df_corr = CorrMatrix
         self.plot_dic = {}
+        self.number_of_save = 0
 
     def create_plot_dic(self, n_closer_genes, max_dist):
         """Function to create a dictionary which is used to plot the genome.
@@ -87,21 +88,59 @@ class TranscripMap3D:
         ys = [-1]*len(self.plot_dic)
         zs = [-1]*len(self.plot_dic)
         color = [-1]*len(self.plot_dic)
-        labels = [""]*len(self.plot_dic)
+        names = [""]*len(self.plot_dic)
         for i, gene in enumerate(self.plot_dic):
             xs[i] = self.plot_dic[gene][0]
             ys[i] = self.plot_dic[gene][1]
             zs[i] = self.plot_dic[gene][2]
             color[i] = self.plot_dic[gene][3]
-            labels[i] = gene
+            names[i] = gene
         plot = ax.scatter(xs, ys, zs, c=color, cmap=color_map, marker="o")
-        ax.set_xlabel('X Label')
-        ax.set_ylabel('Y Label')
-        ax.set_zlabel('Z Label')
+        ax.set_xlabel('X axe')
+        ax.set_ylabel('Y axe')
+        ax.set_zlabel('Z axe')
         fig.colorbar(plot)
-        plt.title("3D TRANSCRIPTION MAP", loc="left")
+        genome_name = names[0].split("_")[0]
+        plt.title("3D TRANSCRIPTION MAP OF {}".format(genome_name), loc="left")
+        annot = ax.annotate("", xy=(0,0), xytext=(20,20),textcoords="offset points",
+                        bbox=dict(boxstyle="round", fc="w"),
+                        arrowprops=dict(arrowstyle="->"))
+        annot.set_visible(False)
+        # https://stackoverflow.com/questions/7908636/possible-to-make-labels-\
+        #appear-when-hovering-over-a-point-in-matplotlib?fbclid=IwAR0XLYQ8h4wJa\
+        #SBPzA5OGMmJLLcbZjdtQrC8KtVUX6FSTHsIxVW-HQF2zbA
+        
+        def update_annot(ind):
+            pos = plot.get_offsets()[ind["ind"][0]]
+            annot.xy = pos
+            text = "{}".format(" ".join([names[n] for n in ind["ind"]]))
+            annot.set_text(text)
+            annot.get_bbox_patch().set_alpha(0.4)
+        
+        def onclick(event):
+            vis = annot.get_visible()
+            if event.inaxes == ax:
+                cont, ind = plot.contains(event)
+                if cont:
+                    update_annot(ind)
+                    annot.set_visible(True)
+                    fig.canvas.draw_idle()
+                else:
+                    if vis:
+                        annot.set_visible(False)
+                        fig.canvas.draw_idle()
+        
+        def save(event):
+            global number_of_save
+            if event.inaxes == ax:
+                if event.key == "ctrl+alt+s":
+                    self.number_of_save+=1
+                    fig.savefig("../results/3DMAP_{}_{}.pdf".format(genome_name, self.number_of_save), bbox_inches='tight')
+                    print("Figure saved.")
+
+        fig.canvas.mpl_connect("button_press_event", onclick)
+        fig.canvas.mpl_connect("key_press_event", save)
         plt.show()
-        fig.savefig("../results/3dmap.pdf", bbox_inches='tight')
 
 
 if __name__ == '__main__':
