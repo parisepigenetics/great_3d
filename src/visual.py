@@ -52,7 +52,7 @@ def visualisation_3d (data_frame, file_name):
         text = ""
         if (len(ind["ind"]) > 1):
             for n in ind["ind"] :
-                text = text+" "+"['"+names[n]+"']"
+                text = text+" "+"['"+names[n]+"']\n"
         else :
             text = names[ind["ind"]]
 
