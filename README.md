@@ -67,3 +67,5 @@ $python3 src/main.py data/SCHIZONTS.genes_pos.txt data/profiles_Otto2010_copy.mi
 At the end of the program process a window will appear with the 3D scatter plot of the result, the points represents the genes and those are coloured following the correlation sum of the closest genes associated to them, you can hover a point with the mouse to get the name of the gene, the plot will also be saved as pdf on the result repository under the name of the gene expression file name.
 Here is an exemple of a result plot :
 ![Screenshot](res_fig.png)
+
+![Screenshot](res_hover.png)
