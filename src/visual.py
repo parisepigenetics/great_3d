@@ -25,6 +25,7 @@ def visualisation_3d (data_frame, file_name):
     ax = fig.add_subplot(111, projection = '3d')
     # ploting the genes
     sc = ax.scatter(x, y, z, c=c, cmap="jet", depthshade = False, picker = True)
+    ax.plot3D(x, y, z, c="black")
 
     # title and labels
     ax.text2D(0.05, 0.95, "3D Transmap of "+file_name, transform=ax.transAxes)
