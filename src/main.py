@@ -1,6 +1,6 @@
 #! /usr/bin/python3
 """
-the main programm of the project
+the main program of the project
 """
 
 import argparse
@@ -45,31 +45,39 @@ if __name__ == "__main__":
     EXP_FILE = ARGS.exp_file
     NBR_GEN = ARGS.nbr_genes
 
+    # get the data from the files
     GENE_POS = gf.gene_data(POS_FILE)
     GENE_EXP = gf.gene_data(EXP_FILE)
 
-    overr = gf.overlaping_genes(GENE_POS.index, GENE_EXP.index)
-    overr = overr.tolist()
+    # get the overlaping genes
+    OVERR = gf.overlaping_genes(GENE_POS.index, GENE_EXP.index)
+    OVERR = OVERR.tolist()
 
-    GEN_POS = pd.DataFrame(GENE_POS.loc[overr])
-    GENE_EXP = pd.DataFrame(GENE_EXP.loc[overr])
+    # keeps only the overlaping genes
+    GEN_POS = pd.DataFrame(GENE_POS.loc[OVERR])
+    GENE_EXP = pd.DataFrame(GENE_EXP.loc[OVERR])
 
+    # calculating the distance matrix
     DIST_MATRIX = pd.DataFrame(dc.distance_matrix(GEN_POS[['X','Y','Z']]))
     DIST_MATRIX.index = GEN_POS.index
     DIST_MATRIX.columns = GEN_POS.index
 
+    # calculating the correlation matrix
     CORR_MATRIX = dc.correlation_matrix(GENE_EXP.transpose())
 
-    SUM_CORR = dc.close_genes_correlation (DIST_MATRIX, CORR_MATRIX, NBR_GEN, overr)
+    # getting the correlations sum of the closest genes for each gene
+    SUM_CORR = dc.close_genes_correlation (DIST_MATRIX, CORR_MATRIX, NBR_GEN, OVERR)
 
     SUM_CORR = pd.DataFrame([SUM_CORR], columns=SUM_CORR.keys())
     SUM_CORR.rename(index = {0: "sum_corr"}, inplace = True)
 
+    # joining to get the position and correlations sum data frame
     TRANSMAP3D = SUM_CORR.transpose().join(GEN_POS[['X','Y','Z']], how='outer')
 
     if not path.exists("result"):
         makedirs("result")
 
+    # ploting the result
     END = vsl.visualisation_3d (TRANSMAP3D, EXP_FILE.split("/")[-1].split(".")[0])
 
     print("duration of the programm : ", complete_time(START, END))

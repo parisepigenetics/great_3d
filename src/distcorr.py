@@ -1,6 +1,6 @@
 #! /usr/bin/python3
 """
-programm that creates distance and correlation matrix
+program that creates distance and correlation matrix
 """
 
 import scipy.spatial
@@ -8,14 +8,14 @@ import scipy.spatial
 
 def distance_matrix (position_data_frame):
     """
-    
+    function that creates a distance matrix
     """
     return scipy.spatial.distance.cdist(position_data_frame, position_data_frame, metric='euclidean')
 
 
 def correlation_matrix (expression_data_frame):
     """
-    
+    function that creates a correlation matrix
     """
     print("processing the creation of the correlation matrix this may take several minutes")
     return expression_data_frame.corr(method = 'spearman')
@@ -23,7 +23,7 @@ def correlation_matrix (expression_data_frame):
 
 def close_genes_correlation (dict_matrix, corr_matrix, nbr_gen, overr):
     """
-
+    function that gives the correlation sum of the nbr_gen closest genes for each gene
     """
     SUM_CORR = {}
     for gene in overr :

@@ -1,6 +1,6 @@
 #! /usr/bin/python3
 """
-gene expression and position files management programm
+gene expression and position files management program
 """
 
 import argparse
@@ -9,14 +9,15 @@ import pandas as pd
 
 def gene_data (gene_file):
     """
-
+    function that reads a gene position or gene expression file and
+    returns a dataframe
     """
     return pd.read_csv(gene_file, delim_whitespace = True)
 
 
 def overlaping_genes (position_data_frame, expression_data_frame):
     """
-    
+    function that returns the overlaping genes between the two data frames
     """
     return expression_data_frame.intersection(position_data_frame)
 
