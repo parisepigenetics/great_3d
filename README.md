@@ -64,7 +64,7 @@ This program permits to display a 3D transcription map of a genome.
     * "mouse click left" = rotate the figure in terms of mouse mouvement
     * "mouse click right" = zoom in terms of mouse mouvement
 
-Keep an eyes on the terminal, some informations on your command will appear. 
+Keep one eye on the terminal, some informations on your command will appear. 
 
 ## Documentation
 
