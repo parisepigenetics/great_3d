@@ -59,7 +59,7 @@ This program permits to display a 3D transcription map of a genome.
 
 * you will have a scatter plot of matplotlib, there are some key event, mouse event:
     
-    * "clt+alt+s" = save your current image
+    * "clt+alt+s" = save your current image in results/
     * "mouse click" on a point = display gene name (thanks to Hocine Meraouna who shows me https://stackoverflow.com/questions/7908636/possible-to-make-labels-appear-when-hovering-over-a-point-in-matplotlib?fbclid=IwAR0XLYQ8h4wJaSBPzA5OGMmJLLcbZjdtQrC8KtVUX6FSTHsIxVW-HQF2zbA )
     * "mouse click left" = rotate the figure in terms of mouse mouvement
     * "mouse click right" = zoom in terms of mouse mouvement
