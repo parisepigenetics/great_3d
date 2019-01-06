@@ -21,3 +21,8 @@ def check_file(path):
             return file
         sys.exit("Your path: '{}' doesn't point on a file!".format(path))
     sys.exit("Your Path: '{}' is wrong, file doesn't exist!".format(path))
+
+
+if __name__ == '__main__':
+    import file_manager
+    print(help(file_manager))
