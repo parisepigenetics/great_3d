@@ -64,8 +64,10 @@ This program permits to display a 3D transcription map of a genome.
     * "mouse click left" = rotate the figure in terms of mouse mouvement
     * "mouse click right" = zoom in terms of mouse mouvement
 
+Keep an eyes on the terminal, some informations on your command will appear. 
+
 ## Documentation
 
 * you can read doc with command line: see in "How to use it" with help function. 
-* go to 3DtranscriptionMap/doc/pythonDoc/Doxygen_doc/index.html
+* go to 3DtranscriptionMap/doc/pythonDoc/DoxygenDoc/html/index.html
 * you have the rules for the project in 3DtranscriptionMap/doc/projectInfo
