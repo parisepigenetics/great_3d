@@ -48,7 +48,7 @@ This program permits to display a 3D transcription map of a genome.
     * python3 map3d.py
     * python3 file_manager.py
 
-## Some examples
+## Example or test
 
 * python3 main.py ../data/SCHIZONTS.genes_pos.txt ../data/profiles_Otto2010.min 7 magma 0.5
     * path_to_3Dpos_file = ../data/SCHIZONTS.genes_pos.txt
