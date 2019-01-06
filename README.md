@@ -17,6 +17,13 @@ M2BI
 This is a program made for a project at the university of Paris 7 in master 2 of bio-informatics.
 This program permits to display a 3D transcription map of a genome.
 
+# Needed libraries
+
+* numpy
+* matplotlib
+* pandas
+* scipy
+
 # Needed Files 
 
 * file_manager.py
