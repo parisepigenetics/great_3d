@@ -71,3 +71,4 @@ Keep one eye on the terminal, some informations on your command will appear.
 * you can read doc with command line: see in "How to use it" with help function. 
 * go to 3DtranscriptionMap/doc/pythonDoc/DoxygenDoc/html/index.html
 * you have the rules for the project in 3DtranscriptionMap/doc/projectInfo
+* you can find color maps here: https://matplotlib.org/examples/color/colormaps_reference.html
