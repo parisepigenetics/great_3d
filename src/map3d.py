@@ -88,6 +88,7 @@ class TranscripMap3D:
         ys = [-1]*len(self.plot_dic)
         zs = [-1]*len(self.plot_dic)
         color = [-1]*len(self.plot_dic)
+        size = [-1]*len(self.plot_dic)
         names = [""]*len(self.plot_dic)
         for i, gene in enumerate(self.plot_dic):
             xs[i] = self.plot_dic[gene][0]
@@ -95,7 +96,10 @@ class TranscripMap3D:
             zs[i] = self.plot_dic[gene][2]
             color[i] = self.plot_dic[gene][3]
             names[i] = gene
-        plot = ax.scatter(xs, ys, zs, c=color, cmap=color_map, marker="o")
+        mini=min(color)
+        maxi=max(color)
+        colors = [(float(i)-mini)/(maxi-mini) for i in color]
+        plot = ax.scatter(xs, ys, zs, c=colors, cmap=color_map, marker="o")
         ax.set_xlabel('X axe')
         ax.set_ylabel('Y axe')
         ax.set_zlabel('Z axe')
