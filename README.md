@@ -10,7 +10,10 @@ Small python program used to analyse the spatial correlations and associations b
 
 ### System :
 * Linux : 
-This program has only been tested on a Linux environment and thus is not guaranteed to work on other ones.
+This program works on a Linux environment.
+
+* Windows :
+It also works on Windows.
 
 ### Python packages :
 In order to be able to run this program of course you need to have python3 but also some python packages :
