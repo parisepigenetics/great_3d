@@ -57,6 +57,8 @@ or download it.
 $python3 main.py gene_position_file gene_expression_file nbr_of_close_genes 
 ```
 
+replace python3 with py for windows.
+
 
 ### Exemple of usage :
 If you are on the 3D_transmap_Meraouna repository you can type the following command line to run the programm on *plasmodium falciparum* with a selection of the 10 closest genes :
