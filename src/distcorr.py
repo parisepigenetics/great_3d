@@ -19,6 +19,7 @@ def correlation_matrix (expression_data_frame):
     """
     #print("processing the creation of the correlation matrix this may take several minutes")
     return expression_data_frame.corr(method = 'pearson')#spearman changed to pearson for faster result
+#note that pearson is less robust than spearman
 
 
 def close_genes_correlation (dict_matrix, corr_matrix, nbr_gen, overr):
