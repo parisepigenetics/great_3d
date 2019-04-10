@@ -25,10 +25,8 @@ def dico_matrice(matrice):
         dico[matrice.index[i]] =   matrice[matrice.index[i]].sort_values()[1:11]
     return dico
 
-'''if __name__ == '__main__':
-    #print(dico('1000genes'))
-    matrice = gd.dico('test_GE_Dist_Miara.tab')
-    from multiprocessing import Pool
-    with Pool(5) as p :
-        x= p.map(gd.dico_matrice,[matrice])
-    print(x)'''
+'''from multiprocessing import Pool
+with pool(5) as p : 
+	print(p.map(dico....)'''
+  
+	
