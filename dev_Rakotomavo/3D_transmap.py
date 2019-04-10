@@ -14,10 +14,6 @@ parser.add_argument("matrice" , nargs='?' ,  default='-')
 args = parser.parse_args()
 matrice_dist = me3d.distance_matrice(args.infile)
 
-from multiprocessing import Pool
-with Pool(5) as p :
-    x= p.map(me3d.dico_matrice,[matrice_dist])
-
 if args.matrice:
     print(matrice_dist)
 
