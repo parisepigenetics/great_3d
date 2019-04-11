@@ -22,12 +22,25 @@ def distance_matrice(data):
         matrice_dist= matrice_dist.rename(index= {i:dt.index[i]})
     return matrice_dist
 
-def dico_matrice(matrice, nb_genes):
+def dico_matrice(matrice):
     '''
-    Function that return the N closest genes
+    Function that return All distance of genes
     '''
     dico = {}
     for i in range(len(matrice)):
         #dico[dt.index[i]] =  matrice[dt.index[i]].sort_values()[1:10].index
-        dico[matrice.index[i]] =   matrice[matrice.index[i]].sort_values()[1:nb_genes+1]
+        dico[matrice.index[i]] =   matrice[matrice.index[i]].sort_values()[1:]
     return dico
+
+def dico_N_matrice(dico ,  nb_genes):
+    '''
+    Function that return the N closest Genes, Because
+    The multiprocessing Function doesn t work on a
+    function with more than One argument
+    '''
+    dico_N_genes = {}
+    for i in range(len(dico)):
+        a = list(dico.keys())[i]
+        b = list(dico.values())[i][1:nb_genes+1]
+        dico_N_genes[a] = b
+    return dico_N_genes

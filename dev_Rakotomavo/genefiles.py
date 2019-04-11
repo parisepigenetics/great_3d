@@ -25,6 +25,8 @@ optional arguments:
 '''
 import argparse
 import multiprocessing
+from multiprocessing import Pool
+from functools import partial
 import multiepigenomics_3d as me3d
 
 parser = argparse.ArgumentParser(description="3D transcription map, main file")
@@ -35,8 +37,6 @@ help = 'Path to the file containing the x, y , z coordinates of genes ')'''
 
 parser.add_argument("outfile", nargs='?', default="-" , type = argparse.FileType('w') ,
 metavar='output_file', help="Path to the outputfile of genes Dictionnary . (or STDOUT)")
-
-
 parser.add_argument("-e", "--exp_file" , help = 'path to the file containing the gene expression --DEFAULT :test_GE_Dist_Miara.tab ',
 type = str, default = "test_GE_Dist_Miara.tab")
 parser.add_argument("-n" , "--nb_genes" , help = "Select the number of the closest genes-- DEFAULT = 10" ,
@@ -48,7 +48,12 @@ args = parser.parse_args()
 exp_file = args.exp_file
 nb_genes = args.nb_genes
 matrice_dist = me3d.distance_matrice(exp_file)
-N_closest_genes = me3d.dico_matrice(matrice_dist , nb_genes)
+All_closest_genes = me3d.dico_matrice(matrice_dist)
+'''
+p = multiprocessing.Pool(5)
+All_closest_genes = p.map(me3d.dico_matrice, [matrice_dist])
+'''
+N_closest_genes = me3d.dico_N_matrice(All_closest_genes,nb_genes)
 
 #WRITTING and FILLIN IN THE OUTPUT FILE :
 outfile = args.outfile
