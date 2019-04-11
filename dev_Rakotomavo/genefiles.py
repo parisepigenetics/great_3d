@@ -49,6 +49,7 @@ exp_file = args.exp_file
 nb_genes = args.nb_genes
 matrice_dist = me3d.distance_matrice(exp_file)
 N_closest_genes = me3d.dico_matrice(matrice_dist , nb_genes)
+
 #WRITTING and FILLIN IN THE OUTPUT FILE :
 outfile = args.outfile
 for i in N_closest_genes :

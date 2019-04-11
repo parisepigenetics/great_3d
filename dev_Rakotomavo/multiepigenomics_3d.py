@@ -5,6 +5,7 @@ import pandas as pd
 import numpy as np
 import scipy
 from scipy.spatial import distance_matrix
+from multiprocessing import Pool
 import math
 
 def distance_matrice(data):
@@ -30,7 +31,3 @@ def dico_matrice(matrice, nb_genes):
         #dico[dt.index[i]] =  matrice[dt.index[i]].sort_values()[1:10].index
         dico[matrice.index[i]] =   matrice[matrice.index[i]].sort_values()[1:nb_genes+1]
     return dico
-
-'''from multiprocessing import Pool
-with pool(5) as p :
-	print(p.map(dico....)'''
