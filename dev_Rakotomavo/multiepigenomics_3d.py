@@ -8,7 +8,10 @@ from scipy.spatial import distance_matrix
 import math
 
 def distance_matrice(data):
-    import pandas as pd
+    '''
+    Function that reads a gene position or a gene expression file
+    and return the distance Matrice into a DataFrame
+    '''
     dt = pd.read_csv(data, sep = '\t')
     ndarray = scipy.spatial.distance.pdist(dt)
     matrix_uni = scipy.spatial.distance.squareform(ndarray)
@@ -18,15 +21,16 @@ def distance_matrice(data):
         matrice_dist= matrice_dist.rename(index= {i:dt.index[i]})
     return matrice_dist
 
-def dico_matrice(matrice):
+def dico_matrice(matrice, nb_genes):
+    '''
+    Function that return the N closest genes
+    '''
     dico = {}
     for i in range(len(matrice)):
         #dico[dt.index[i]] =  matrice[dt.index[i]].sort_values()[1:10].index
-        dico[matrice.index[i]] =   matrice[matrice.index[i]].sort_values()[1:11]
+        dico[matrice.index[i]] =   matrice[matrice.index[i]].sort_values()[1:nb_genes+1]
     return dico
 
 '''from multiprocessing import Pool
-with pool(5) as p : 
+with pool(5) as p :
 	print(p.map(dico....)'''
-  
-	
