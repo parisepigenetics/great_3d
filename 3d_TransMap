@@ -6,8 +6,6 @@ genes Dctionnary file of the N closest Genes
 """
 
 import argparse
-# TODO the multiprocessing should be in the module and not in the program.
-import multiprocessing
 import multiepigenomics_3d as me3d
 
 
@@ -22,8 +20,9 @@ args = parser.parse_args()
 
 # CALCULATION OF THE DISTANCE MATRIX
 distanceMatrix = me3d.matrix_distance(args.genePos)
+#CREATING THE DICTIONNARY WITHOUT PARRALLELIZATION
 sortedDict = me3d.dico_matrix(distanceMatrix)
-
-# WRITTING and FILLIN IN THE OUTPUT FILE :
-for k, v in sortedDict.items():
+#CREATING THE DICTIONNARY WITH PARALLELIZATION
+sortedDict_parallelization = list.pop(me3d.parallelization_dico_matrix(distanceMatrix))
+for k, v in sortedDict_parallelization.items():
     args.outfile.write("ID: {} - Genes {}\n".format(k, v))

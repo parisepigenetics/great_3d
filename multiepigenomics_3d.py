@@ -20,19 +20,19 @@ def matrix_distance(data):
     matrix_dist = pd.DataFrame(matrix_uni)
     matrix_dist.columns = geneNames
     matrix_dist.index = geneNames
-    #for i in range(len(matrix_dist)):  # No need to do this copmplicated loop.
-    #    matrix_dist = matrix_dist.rename(columns={i:df.index[i]})
-    #    matrix_dist = matrix_dist.rename(index={i:df.index[i]})
     return matrix_dist
 
 def dico_matrix(matrix):
     '''Get a distance matrix (Pandas DataFrame) and return a dictionary of sorted genes with each gene as a key.
     '''
     sortingDict = {}
-    # TODO put multiprocessing and parallelise this for loop ONLY (for the moment).
-    for i in range(len(matrix)):  # Loop over the data frame row names (i.e. gene names).
-        sortingDict[matrix.index[i]] = matrix[matrix.index[i]].sort_values()
+    for gene_name in matrix.index:
+        sortingDict[gene_name] = matrix[gene_name].sort_values()
     return sortingDict
 
-# If you want put it here.
-#print('le nombre de processeur utilisé est de : ', multiprocessing.cpu_count())
+def parallelization_dico_matrix(matrix) :
+    '''Running the dico_matrix function using Multiprocessing
+    '''
+    with Pool(5) as p :
+    	sortingDict_multi = p.map(dico_matrix,[matrix])
+    return sortingDict_multi
