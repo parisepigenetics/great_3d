@@ -1,0 +1,29 @@
+#!/usr/bin/env python3
+
+"""
+gene expression and position files management programm to create
+genes Dctionnary file of the N closest Genes
+"""
+
+import argparse
+# TODO the multiprocessing should be in the module and not in the program.
+import multiprocessing
+import multiepigenomics_3d as me3d
+
+
+parser = argparse.ArgumentParser(description="3D transcription map, main file")
+# Positionnal argument containing the 3D coordinate of genes
+parser.add_argument("-p", "--positions-file", type=argparse.FileType('r'), help='Path to the file containing the x, y, z coordinates of genes', dest="genePos", metavar="genes_position_file")
+#parser.add_argument("-e", "--geneExpression-file", type=argparse.FileType('r'), help='path to the file containing the gene expression ', type=str, dest="geneExpr", metavar="gene_expression_file")
+parser.add_argument("outfile", nargs='?', default="-", type=argparse.FileType('w'), metavar='output_file', help="Path to the outputfile of genes Dictionnary (or STDOUT).")
+parser.add_argument("-n", "--nb-genes", help="Select the number of the closest genes --DEFAULT = 10", type=int, default=10, dest="nGenes", metavar="no_genes")
+
+args = parser.parse_args()
+
+# CALCULATION OF THE DISTANCE MATRIX
+distanceMatrix = me3d.matrix_distance(args.genePos)
+sortedDict = me3d.dico_matrix(distanceMatrix)
+
+# WRITTING and FILLIN IN THE OUTPUT FILE :
+for k, v in sortedDict.items():
+    args.outfile.write("ID: {} - Genes {}\n".format(k, v))
