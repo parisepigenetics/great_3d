@@ -23,6 +23,7 @@ distanceMatrix = me3d.matrix_distance(args.genePos)
 
 #CREATING THE DICTIONNARY WITH PARALLELIZATION
 sortedDict = list.pop(me3d.parallelise_sorting_matrix(distanceMatrix))
+print(sortedDict)
 
 # TODO: 1. Get the gene expression matirx.
 #       2. For each of the n_genes get the gene expression and put them in a data frame. (for paralelisation, take the list of keys form the dict, split it is ncpus chunks and paralelise the process.)

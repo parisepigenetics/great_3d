@@ -18,8 +18,8 @@ def matrix_distance(data):
     """
     df = pd.read_csv(data, sep='\t')
     geneNames = df.index
-    ndarray = distance.pdist(df)
-    matrix_uni = distance.squareform(ndarray)
+    ndarray = scipy.spatial.distance.pdist(df)
+    matrix_uni = scipy.spatial.distance.squareform(ndarray)
     matrix_dist = pd.DataFrame(matrix_uni)
     matrix_dist.columns = geneNames
     matrix_dist.index = geneNames
@@ -36,7 +36,8 @@ def dico_matrix(matrix):
 def parallelise_sorting_matrix(df) :
     '''Running the dico_matrix function using Multiprocessing
     '''
-    cpus = cpu_count() - 1
+    #cpus = cpu_count() - 1
+    cpus = 1
     with Pool(cpus) as pool:
         # Split the data frame.
         df_split = np.array_split(df, cpus)
