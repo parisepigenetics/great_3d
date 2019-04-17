@@ -39,12 +39,12 @@ def parallelise_sorting_matrix(df) :
     #cpus = cpu_count() - 1
     cpus = 1
     with Pool(cpus) as pool:
-        # Split the data frame.
+        # Split the data frame
         df_split = np.array_split(df, cpus)
         sorted_list_df = pool.map(dico_matrix, df_split)
-        pool.close
+        pool.close()
+        pool.join()
     return sorted_list_df
-
 
 ## Nice wrapper to time functions. Works as a decorator.
 # Taken from https://stackoverflow.com/questions/5478351/python-time-measure-function
