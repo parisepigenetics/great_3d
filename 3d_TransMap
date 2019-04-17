@@ -36,6 +36,7 @@ gene_expression = pd.read_csv('test_GE_Dist_Miara.tab', sep='\t')
 GENES for EACH GENES ??? SEARCHING A WAY TO PUT INTO A DATA FRAME
 '''
 dico_N_closest = {}
+#exemple : Printing of the gene expression of the top 5 closest genes for each genes
 for genes_name in sortedDict :
     closest_genes = list(pd.DataFrame(sortedDict[genes_name][0:5]).index)
     dico_N_closest[genes_name] = list(closest_genes) # => donne la liste des N_closest genes
