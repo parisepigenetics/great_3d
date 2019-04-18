@@ -23,6 +23,7 @@ distanceMatrix = me3d.matrix_distance(args.genePos)
 
 #CREATING THE DICTIONNARY WITH PARALLELIZATION
 sortedDict = list.pop(me3d.parallelise_sorting_matrix(distanceMatrix))
+#print(sortedDict)
 
 
 # TODO: 1. Get the gene expression matirx.
@@ -30,12 +31,28 @@ sortedDict = list.pop(me3d.parallelise_sorting_matrix(distanceMatrix))
 #       3.  For each of the rows in the above data frame (i.e. gene_names as index) you compute the sum of correlations of the first element with all the rests. To paralelise that, follow the same way we did in the parallelise_sorting_matrix.
 
 
+dico_N_closest = {}
+#exemple : Printing of the gene expression of the top 5 closest genes for each genes
+for genes_name in sortedDict :
+    closest_genes = list(pd.DataFrame(sortedDict[genes_name]).index)
+    dico_N_closest[genes_name] = list(closest_genes) # => donne la liste des N_closest genes
+    
 gene_expression = pd.read_csv('test_GE_Dist_Miara.tab', sep='\t')
+gene_exp = pd.DataFrame(gene_expression)
+
+CORR_MATRIX = me3d.correlation_matrix(gene_exp.transpose())
+
+sum_Corr = {}
+for gene , closest_gene in dico_N_closest.items() :
+    genePosCor = abs(CORR_MATRIX.loc[gene,closest_gene].sum())
+    sum_Corr[gene] = genePosCor
+
+print(sum_Corr)
 
 ''' PRINTING THE EXPRESSION OF the N CLOSEST
 GENES for EACH GENES ??? SEARCHING A WAY TO PUT INTO A DATA FRAME
 '''
-dico_N_closest = {}
+'''dico_N_closest = {}
 #exemple : Printing of the gene expression of the top 5 closest genes for each genes
 for genes_name in sortedDict :
     closest_genes = list(pd.DataFrame(sortedDict[genes_name][0:5]).index)
@@ -47,3 +64,4 @@ for gene in dico_N_closest :
     for i in dico_N_closest[gene] :
         #print('{} = {}\n'.format(i,gene_expression.values[gene_expression.index == i]))
         print(gene_expression.values[gene_expression.index == i],'\n')
+'''

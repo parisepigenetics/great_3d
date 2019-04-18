@@ -56,3 +56,9 @@ def timing(f):
         print('{:s} function took {:.3f} ms'.format(f.__name__, (time2-time1)*1000.0))
         return ret
     return wrap
+
+def correlation_matrix (expression_data_frame):
+    """
+    function that creates a correlation matrix
+    """
+    return expression_data_frame.corr(method = 'spearman') #or Pearson
