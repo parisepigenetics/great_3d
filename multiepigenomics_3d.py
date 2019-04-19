@@ -46,6 +46,15 @@ def parallelise_sorting_matrix(df) :
         pool.join()
     return sorted_list_df
 
+def closest_gene_name(dico_closest_gene):
+    '''Get the Dictionnary of sorted genes and return only the name of the N closest gene with each gene as a key
+    '''
+    dico_name_closest_gene = {}
+    for gene_name in dico_closest_gene :
+        closest_genes = list(pd.DataFrame(dico_closest_gene[gene_name][1:]).index)
+        dico_name_closest_gene[gene_name] = closest_genes
+    return dico_name_closest_gene
+
 ## Nice wrapper to time functions. Works as a decorator.
 # Taken from https://stackoverflow.com/questions/5478351/python-time-measure-function
 def timing(f):
@@ -57,8 +66,19 @@ def timing(f):
         return ret
     return wrap
 
-def correlation_matrix (expression_data_frame):
+def correlation_matrix(gene_expression_file):
     """
-    function that creates a correlation matrix
+    Gets the gene Expression filename, return the Correlation matrix as a Pandas DataFrame.
     """
-    return expression_data_frame.corr(method = 'spearman') #or Pearson
+    gene_expression_df = pd.read_csv(gene_expression_file , sep ='\t').transpose()
+    return gene_expression_df.corr(method = 'spearman') #or Pearson
+
+def sum_Correlation(distance_dico , correlation_matrix):
+    """
+    Gets the Dictionnary of the closest_gene and the correlation Matrix, return a Dictionnary of the sum of correlation for each gene
+    """
+    dico_sum_Correlation = {}
+    for gene , closest_gene in distance_dico.items():
+        sum_correlation = abs(correlation_matrix.loc[gene,closest_gene].sum())
+        dico_sum_Correlation[gene] = sum_correlation
+    return dico_sum_Correlation
