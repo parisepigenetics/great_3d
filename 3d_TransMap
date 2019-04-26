@@ -10,6 +10,7 @@ import pandas as pd
 import multiepigenomics_3d as me3d
 
 import sys
+import pprint
 
 parser = argparse.ArgumentParser(description="3D transcription map, main program.")
 # Positionnal argument containing the 3D coordinate of genes
@@ -30,10 +31,9 @@ sortedDict = me3d.sorting_distances(distanceMatrix)
 # NOTE: The paralelised code does not work faster and it does freeze the machine for large genomes.
 
 # Compute a dictionnary of the sum of correlations between each gene and the others.
-sum_Corr = me3d.sum_correlation(sortedDict_name, args.geneExpr, args.noGenes)
+sum_Corr = me3d.sum_correlation(sortedDict, args.geneExpr, args.nGenes)
 
-print(sum_Corr)
+pprint.pprint(sum_Corr)
 
-# TODO: 1. Get the gene expression matirx.
-#       2. For each of the n_genes get the gene expression and put them in a data frame. (for paralelisation, take the list of keys form the dict, split it is ncpus chunks and paralelise the process.)
-#       3.  For each of the rows in the above data frame (i.e. gene_names as index) you compute the sum of correlations of the first element with all the rests. To paralelise that, follow the same way we did in the parallelise_sorting_matrix.
+# TODO: 1. FOLLOW the ToDos in the library file.
+#       2. Start the 3D visualisation with plotly!

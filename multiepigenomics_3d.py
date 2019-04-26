@@ -1,6 +1,6 @@
 # -*- coding: utf-8  -*-
 
-"""Main multi epigenetics viewer moddule.
+"""Module with all the multi-omics epigenetic analysis functions.
 """
 
 import math
@@ -10,6 +10,8 @@ import scipy
 from multiprocessing import cpu_count, Pool
 import pandas as pd
 from scipy.spatial import distance_matrix
+from scipy.stats import pearsonr
+
 
 ## Nice wrapper to time functions. Works as a decorator.
 # Taken from https://stackoverflow.com/questions/5478351/python-time-measure-function
@@ -46,14 +48,27 @@ def sorting_distances(dist_df):
     return sortedDict
 
 
-def sum_Correlation(distance_dico , correlation_matrix):
-    """Gets the Dictionnary of the closest_gene and the correlation Matrix, return a Dictionnary of the sum of correlation for each gene
+def sum_correlation(sorted_dists, ge_file, no_genes):
+    """Gets the dictionnary of the closest genes, the gene expression file and the number of genes we need to compute correlation.
+    Return a dictionnary of the sum of correlations for each gene
     """
-    dico_sum_Correlation = {}
-    for gene , closest_gene in distance_dico.items():
-        sum_correlation = abs(correlation_matrix.loc[gene,closest_gene].sum())
-        dico_sum_Correlation[gene] = sum_correlation
-    return dico_sum_Correlation
+    # Read the GE file
+    geDF = pd.read_csv(ge_file, sep='\t')
+    # Convert the GE data frame to a dictionary.
+    geD = geDF.T.to_dict('list')
+    correlation_sums = {}
+    # Here is the actual calculation.
+    for gene_ref, closest_genes in sorted_dists.items():
+        # TODO check if we gain time when we paralelise this for loop!
+        selected_genes = list(closest_genes[1:no_genes + 1].index)
+        ref_GE = geD[gene_ref]
+        correlations = [pearsonr(ref_GE, geD[s])[0] for s in selected_genes]
+        # NOTE incase we need to use the absolute values we can flip to that.  correlations = [abs(pearsonr(ref_GE, geD[s])[0]) for s in selected_genes]
+        # NOTE The pearsonr method returns the p-value for a 2 tauiled-correlation test, so perhpas we can use it in a later analysis.
+        # TODO the function need to be modular in the sense that we can pass different correlation functions to it. Perhaps use decorators.
+        sum_correlation = sum(correlations)
+        correlation_sums[gene_ref] = sum_correlation
+    return correlation_sums
 
 
 
@@ -79,7 +94,7 @@ def closest_gene_name(dico_closest_gene):
     '''
     dico_name_closest_gene = {}
     for gene_name in dico_closest_gene :
-        closest_genes = list(pd.DataFrame(dico_closest_gene[gene_name][1:]).index)
+        closest_genes = list(pd.DataFrame(dico_closest_gene[gene_name][1:]).index) # This computes correlations between the gene of reference and ALL the other genes.
         dico_name_closest_gene[gene_name] = closest_genes
     return dico_name_closest_gene
 
