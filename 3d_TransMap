@@ -37,8 +37,12 @@ sum_Corr = me3d.sum_correlation(sortedDict, args.geneExpr, args.nGenes , args.mC
 
 pprint.pprint(sum_Corr)
 
-'''The parrallelization is not working yet
-'''
+''' visualization_3 '''
+#me3d.visualization_3D(args.genePos)
+
+
+
+'''The parrallelization is not working yet'''
 #sum_Corr_mp = me3d.sumCor_mp(sortedDict, args.geneExpr, args.nGenes)
 #print(sum_Corr_mp)
 
