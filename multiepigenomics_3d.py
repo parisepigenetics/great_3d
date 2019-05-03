@@ -79,11 +79,11 @@ def sum_correlation(sorted_dists, ge_file, no_genes , type_correlation):
 
 #================ OBSOLETE functions ======================
 
-def sumCor_mp(sorted_dists, ge_file, no_genes) :
+def sumCor_mp(sorted_dists, ge_file, no_genes , type_correlation) :
     cpus = cpu_count() - 1
     dict = {}
     with Pool(cpus) as pool:
-        dict = pool.map(sum_correlation, (sorted_dists , ge_file , no_genes))
+        dict = pool.map(sum_correlation, (sorted_dists , ge_file , no_genes , type_correlation))
         pool.close()
         pool.join()
     return dict
