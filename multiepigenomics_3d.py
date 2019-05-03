@@ -7,10 +7,11 @@ import math
 import time
 import numpy as np
 import scipy
-from multiprocessing import cpu_count, Pool
+from multiprocessing import cpu_count, Pool , Process
+from functools import partial
 import pandas as pd
 from scipy.spatial import distance_matrix
-from scipy.stats import pearsonr
+from scipy.stats import pearsonr , kendalltau , spearmanr
 
 
 ## Nice wrapper to time functions. Works as a decorator.
@@ -48,7 +49,7 @@ def sorting_distances(dist_df):
     return sortedDict
 
 
-def sum_correlation(sorted_dists, ge_file, no_genes):
+def sum_correlation(sorted_dists, ge_file, no_genes , type_correlation):
     """Gets the dictionnary of the closest genes, the gene expression file and the number of genes we need to compute correlation.
     Return a dictionnary of the sum of correlations for each gene
     """
@@ -62,7 +63,13 @@ def sum_correlation(sorted_dists, ge_file, no_genes):
         # TODO check if we gain time when we paralelise this for loop!
         selected_genes = list(closest_genes[1:no_genes + 1].index)
         ref_GE = geD[gene_ref]
-        correlations = [pearsonr(ref_GE, geD[s])[0] for s in selected_genes]
+        if(type_correlation == 'pearson'):
+            correlations = [pearsonr(ref_GE, geD[s])[0] for s in selected_genes]
+        elif(type_correlation == 'kendall'):
+            correlations = [kendalltau(ref_GE, geD[s])[0] for s in selected_genes]
+        elif(type_correlation == 'spearman'):
+            correlations = [spearmanr(ref_GE, geD[s])[0] for s in selected_genes]
+
         # NOTE incase we need to use the absolute values we can flip to that.  correlations = [abs(pearsonr(ref_GE, geD[s])[0]) for s in selected_genes]
         # NOTE The pearsonr method returns the p-value for a 2 tauiled-correlation test, so perhpas we can use it in a later analysis.
         # TODO the function need to be modular in the sense that we can pass different correlation functions to it. Perhaps use decorators.
@@ -70,9 +77,17 @@ def sum_correlation(sorted_dists, ge_file, no_genes):
         correlation_sums[gene_ref] = sum_correlation
     return correlation_sums
 
-
-
 #================ OBSOLETE functions ======================
+
+def sumCor_mp(sorted_dists, ge_file, no_genes) :
+    cpus = cpu_count() - 1
+    dict = {}
+    with Pool(cpus) as pool:
+        dict = pool.map(sum_correlation, (sorted_dists , ge_file , no_genes))
+        pool.close()
+        pool.join()
+    return dict
+
 
 def sorting_dists_parallel(dist_df) :
     '''Get a distance matrix (pandas data frame), return a dictionary of genes and their sorted neighbours.

@@ -18,6 +18,8 @@ parser.add_argument("-p", "--positions-file", type=argparse.FileType('r'), help=
 parser.add_argument("-e", "--geneExpression-file", type=argparse.FileType('r'), help='path to the file containing the gene expression ', dest="geneExpr", metavar="gene_expression_file")
 parser.add_argument("outfile", nargs='?', default="-", type=argparse.FileType('w'), metavar='output_file', help="Path to the outputfile of genes Dictionnary (or STDOUT).")
 parser.add_argument("-n", "--nb-genes", help="Select the number of the closest genes --DEFAULT = 10", type=int, default=10, dest="nGenes", metavar="noGenes")
+parser.add_argument("-c", "--type-correlation", help="Select the type of correlation --DEFAULT = 'pearson'", type=str, default='pearson', dest="typeCorr", metavar="type_correlation")
+
 
 args = parser.parse_args()
 
@@ -31,9 +33,16 @@ sortedDict = me3d.sorting_distances(distanceMatrix)
 # NOTE: The paralelised code does not work faster and it does freeze the machine for large genomes.
 
 # Compute a dictionnary of the sum of correlations between each gene and the others.
-sum_Corr = me3d.sum_correlation(sortedDict, args.geneExpr, args.nGenes)
+sum_Corr = me3d.sum_correlation(sortedDict, args.geneExpr, args.nGenes , args.typeCorr)
 
 pprint.pprint(sum_Corr)
+
+'''The parrallelization is not working yet
+'''
+#sum_Corr_mp = me3d.sumCor_mp(sortedDict, args.geneExpr, args.nGenes)
+#print(sum_Corr_mp)
+
+
 
 # TODO: 1. FOLLOW the ToDos in the library file.
 #       2. Start the 3D visualisation with plotly!
