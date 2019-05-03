@@ -13,6 +13,8 @@ import pandas as pd
 from scipy.spatial import distance_matrix
 from scipy.stats import pearsonr , kendalltau , spearmanr
 
+from mpl_toolkits.mplot3d import Axes3D
+import matplotlib.pyplot as plt
 
 ## Nice wrapper to time functions. Works as a decorator.
 # Taken from https://stackoverflow.com/questions/5478351/python-time-measure-function
@@ -77,6 +79,17 @@ def sum_correlation(sorted_dists, ge_file, no_genes , type_correlation):
         correlation_sums[gene_ref] = sum_correlation
     return correlation_sums
 
+def visualization_3D(position_file):
+    dt = pd.read_csv(position_file, sep='\t')
+    fig = plt.figure()
+    ax = fig.add_subplot(111, projection='3d')
+
+    x = dt[[0]]
+    y = dt[[1]]
+    z = dt[[2]]
+    ax.scatter(x, y, z, c='r', marker='o')
+    ax.set_xlabel('X Label'), ax.set_ylabel('Y Label'), ax.set_zlabel('Z Label')
+    plt.show()
 #================ OBSOLETE functions ======================
 
 def sumCor_mp(sorted_dists, ge_file, no_genes , type_correlation) :
