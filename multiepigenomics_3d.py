@@ -13,8 +13,12 @@ import pandas as pd
 from scipy.spatial import distance_matrix
 from scipy.stats import pearsonr , kendalltau , spearmanr
 
-from mpl_toolkits.mplot3d import Axes3D
-import matplotlib.pyplot as plt
+import plotly
+import plotly.plotly as py
+import plotly.graph_objs as go
+plotly.tools.set_credentials_file(username='miara1502', api_key='LM3BdwFIOFpJmq3DP6CQ')
+# NOTE: we have to create an account to run the programm correctyl
+# NOTE: we can visualize the Plot on our own account
 
 ## Nice wrapper to time functions. Works as a decorator.
 # Taken from https://stackoverflow.com/questions/5478351/python-time-measure-function
@@ -79,17 +83,49 @@ def sum_correlation(sorted_dists, ge_file, no_genes , type_correlation):
         correlation_sums[gene_ref] = sum_correlation
     return correlation_sums
 
-def visualization_3D(position_file):
-    dt = pd.read_csv(position_file, sep='\t')
-    fig = plt.figure()
-    ax = fig.add_subplot(111, projection='3d')
+def visualization_3D(position_file,correlation_dict):
+    pos_dt = pd.read_csv(position_file, sep='\t')
+    #dt = pd.read_csv('genesSchiz100_pos.txt', sep='\t')
+    pos_dt['corr'] = 'default value'
+    '''Adding the correlation columns into the genePos data Frame'''
+    for gene_ref in correlation_dict:
+        pos_dt['corr'][gene_ref] = correlation_dict[gene_ref]
 
-    x = dt[[0]]
-    y = dt[[1]]
-    z = dt[[2]]
-    ax.scatter(x, y, z, c='r', marker='o')
-    ax.set_xlabel('X Label'), ax.set_ylabel('Y Label'), ax.set_zlabel('Z Label')
-    plt.show()
+    # Taken from https://plot.ly/python/3d-scatter-plots/ and adjusted with our values
+    ''' VISUALIZATION_3D '''
+    x = pos_dt[[0]]
+    y = pos_dt[[1]]
+    z = pos_dt[[2]]
+    corr = pos_dt[[3]]
+    trace1 = go.Scatter3d(
+        x=x,
+        y=y,
+        z=z,
+        text = pos_dt.index ,
+        hoverinfo = 'text' ,
+
+        mode='markers',
+        marker=dict(
+            size=6,
+            color=corr,
+            colorscale='Reds', # choose a colorscale
+            opacity=0.8
+        ),
+        showlegend = False
+    )
+
+    data = [trace1]
+    layout = go.Layout(
+        margin=dict(
+            l=0,
+            r=0,
+            b=0,
+            t=0
+        )
+    )
+    fig = go.Figure(data=data, layout=layout)
+    py.iplot(fig, filename='3d-scatter-colorscale_LEGEND')
+
 #================ OBSOLETE functions ======================
 
 def sumCor_mp(sorted_dists, ge_file, no_genes , type_correlation) :
