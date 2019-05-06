@@ -27,6 +27,7 @@ args = parser.parse_args()
 
 # Calculate the distance matrix
 distanceMatrix = me3d.calculate_distance(args.genePos)
+args.genePos.close()
 
 # Populate the dictionary of sorted distances.
 sortedDict = me3d.sorting_distances(distanceMatrix)
@@ -40,11 +41,9 @@ sum_Corr = me3d.sum_correlation(sortedDict, args.geneExpr, args.nGenes , args.mC
 pprint.pprint(sum_Corr)
 
 ''' visualization_3D '''
-pos_file2 = 'genesSchiz100_pos.txt'
-# NOTE: The programm doesn't take the args.genePos file for a second time
-# so , I fixed it as a second pos_file but it is the same file
-me3d.visualization_3D(pos_file2 , sum_Corr)
+args.genePos = open(args.genePos.name)
 
+me3d.visualization_3D(args.genePos , sum_Corr)
 
 '''The parrallelization is not working yet'''
 #sum_Corr_mp = me3d.sumCor_mp(sortedDict, args.geneExpr, args.nGenes)

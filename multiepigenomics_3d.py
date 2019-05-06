@@ -83,6 +83,7 @@ def sum_correlation(sorted_dists, ge_file, no_genes , type_correlation):
         correlation_sums[gene_ref] = sum_correlation
     return correlation_sums
 
+
 def visualization_3D(position_file,correlation_dict):
     pos_dt = pd.read_csv(position_file, sep='\t')
     #dt = pd.read_csv('genesSchiz100_pos.txt', sep='\t')
