@@ -20,7 +20,7 @@ parser.add_argument("-p", "--positions-file", type=argparse.FileType('r'), help=
 parser.add_argument("-e", "--geneExpression-file", type=argparse.FileType('r'), help='path to the file containing the gene expression ', dest="geneExpr", metavar="gene_expression_file")
 parser.add_argument("outfile", nargs='?', default="-", type=argparse.FileType('w'), metavar='output_file', help="Path to the outputfile of genes Dictionnary (or STDOUT).")
 parser.add_argument("-n", "--nb-genes", help="Select the number of the closest genes --DEFAULT = 10", type=int, default=10, dest="nGenes", metavar="noGenes")
-parser.add_argument("-c", "--methode-correlation", help="Select the methode of correlation --DEFAULT = 'pearson'", type=str, default='pearson', dest="mCorr", metavar="methode_correlation")
+parser.add_argument("-c", "--method-correlation", help="Select the methode of correlation --DEFAULT = 'pearson'", type=str, default='pearson', dest="mCorr", metavar="methode_correlation")
 
 
 args = parser.parse_args()
@@ -44,10 +44,10 @@ pprint.pprint(sum_Corr)
 args.genePos = open(args.genePos.name)
 
 ''' Plotly '''
-#me3d.visualization_3D_plotly(args.genePos , sum_Corr)
+me3d.visualization_3D_plotly(args.genePos , sum_Corr)
 
 ''' Mathplotlib '''
-me3d.visualization_3D_mtp(args.genePos , sum_Corr)
+#me3d.visualization_3D_mtp(args.genePos , sum_Corr)
 
 
 '''The parrallelization is not working yet'''

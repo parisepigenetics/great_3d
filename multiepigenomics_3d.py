@@ -74,11 +74,11 @@ def sum_correlation(sorted_dists, ge_file, no_genes , type_correlation):
         selected_genes = list(closest_genes[1:no_genes + 1].index)
         ref_GE = geD[gene_ref]
         if(type_correlation == 'pearson'):
-            correlations = [pearsonr(ref_GE, geD[s])[0] for s in selected_genes]
+            correlations = [abs(pearsonr(ref_GE, geD[s])[0]) for s in selected_genes]
         elif(type_correlation == 'kendall'):
-            correlations = [kendalltau(ref_GE, geD[s])[0] for s in selected_genes]
+            correlations = [abs(kendalltau(ref_GE, geD[s])[0]) for s in selected_genes]
         elif(type_correlation == 'spearman'):
-            correlations = [spearmanr(ref_GE, geD[s])[0] for s in selected_genes]
+            correlations = [abs(spearmanr(ref_GE, geD[s])[0]) for s in selected_genes]
 
         # NOTE incase we need to use the absolute values we can flip to that.  correlations = [abs(pearsonr(ref_GE, geD[s])[0]) for s in selected_genes]
         # NOTE The pearsonr method returns the p-value for a 2 tauiled-correlation test, so perhpas we can use it in a later analysis.
