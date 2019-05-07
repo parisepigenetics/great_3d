@@ -43,13 +43,16 @@ pprint.pprint(sum_Corr)
 ''' visualization_3D '''
 args.genePos = open(args.genePos.name)
 
-me3d.visualization_3D(args.genePos , sum_Corr)
+''' Plotly '''
+#me3d.visualization_3D_plotly(args.genePos , sum_Corr)
+
+''' Mathplotlib '''
+me3d.visualization_3D_mtp(args.genePos , sum_Corr)
+
 
 '''The parrallelization is not working yet'''
 #sum_Corr_mp = me3d.sumCor_mp(sortedDict, args.geneExpr, args.nGenes)
 #print(sum_Corr_mp)
-
-
 
 # TODO: 1. FOLLOW the ToDos in the library file.
 #       2. Start the 3D visualisation with plotly!

@@ -20,6 +20,10 @@ plotly.tools.set_credentials_file(username='miara1502', api_key='LM3BdwFIOFpJmq3
 # NOTE: we have to create an account to run the programm correctyl
 # NOTE: we can visualize the Plot on our own account
 
+from mpl_toolkits.mplot3d import Axes3D
+import matplotlib.pyplot as plt
+
+
 ## Nice wrapper to time functions. Works as a decorator.
 # Taken from https://stackoverflow.com/questions/5478351/python-time-measure-function
 def timing(f):
@@ -84,7 +88,10 @@ def sum_correlation(sorted_dists, ge_file, no_genes , type_correlation):
     return correlation_sums
 
 
-def visualization_3D(position_file,correlation_dict):
+def visualization_3D_plotly(position_file,correlation_dict):
+    """Gets the dictionnary of the closest genes, the gene postion file and
+    return a plot of the 3D gene correlation by using Plotly
+    """
     pos_dt = pd.read_csv(position_file, sep='\t')
     #dt = pd.read_csv('genesSchiz100_pos.txt', sep='\t')
     pos_dt['corr'] = 'default value'
@@ -125,7 +132,34 @@ def visualization_3D(position_file,correlation_dict):
         )
     )
     fig = go.Figure(data=data, layout=layout)
-    py.iplot(fig, filename='3d-scatter-colorscale_LEGEND')
+    py.iplot(fig, filename='3d-scatter-colorscale_3D_TRANSMAP')
+
+
+def visualization_3D_mtp(position_file,correlation_dict):
+    """Gets the dictionnary of the closest genes, the gene postion file and
+    return a plot of the 3D gene correlation by using Mathplotlib
+    """
+    pos_dt = pd.read_csv(position_file, sep='\t')
+    fig = plt.figure()
+    ax = fig.add_subplot(111 , projection='3d')
+
+    pos_dt['corr'] = 'default value'
+    '''Adding the correlation columns into the genePos data Frame'''
+    for gene_ref in correlation_dict:
+        pos_dt['corr'][gene_ref] = correlation_dict[gene_ref]
+
+    x = pos_dt[[0]]
+    y = pos_dt[[1]]
+    z = pos_dt[[2]]
+    corr = pos_dt[[3]]
+    ''' VISUALIZATION_3D'''
+    ax.scatter(x , y , z , c='r' , cmap = corr , marker = 'o')
+
+    ax.set_xlabel('X label') , ax.set_ylabel('Y label') , ax.set_zlabel('Z label')
+    plt.show()
+
+
+
 
 #================ OBSOLETE functions ======================
 
