@@ -14,7 +14,6 @@ from scipy.spatial import distance_matrix
 from scipy.stats import pearsonr , kendalltau , spearmanr
 
 import plotly
-import plotly.plotly as py
 import plotly.graph_objs as go
 #plotly.tools.set_credentials_file(username='miara1502', api_key='LM3BdwFIOFpJmq3DP6CQ')
 # NOTE: we have to create an account to run the programm correctyl
@@ -106,35 +105,16 @@ def visualization_3D_plotly(position_file, correlation_dict):
     y = pos_dt.iloc[:,1].tolist()
     z = pos_dt.iloc[:,2].tolist()
     corr = pos_dt.iloc[:,3].tolist()
-    trace1 = go.Scatter3d(
-        x=x,
-        y=y,
-        z=z,
-        text = pos_dt.index ,
-        hoverinfo = 'text' ,
-
-        mode='markers',
-        marker=dict(
-            size=6,
-            color=corr,
-            colorscale='Reds', # choose a colorscale
-            opacity=0.5 , # Transparency
-            showscale = True
-        ),
-        showlegend = False
-    )
-
+    trace1 = go.Scatter3d(x=x, y=y, z=z, text = pos_dt.index,
+    hoverinfo = 'text', mode='markers',
+    marker=dict(size=4, color=corr, colorscale='Reds', # choose a colorscale
+    opacity=0.5 , # Transparency
+    showscale = True),
+    showlegend = False)
     data = [trace1]
-    layout = go.Layout(
-        margin=dict(
-            l=0,
-            r=0,
-            b=0,
-            t=0
-        )
-    )
+    layout = go.Layout(margin=dict(l=0, r=0, b=0, t=0))
     fig = go.Figure(data=data, layout=layout)
-    py.iplot(fig, filename='3d-scatter-colorscale_3D_TRANSMAP_VISUALIZATION')
+    plotly.offline.plot(fig, filename='temp-plot.html', auto_open=True)
 
 
 def visualization_3D_mtp(position_file,correlation_dict):
@@ -144,7 +124,6 @@ def visualization_3D_mtp(position_file,correlation_dict):
     pos_dt = pd.read_csv(position_file, sep='\t')
     fig = plt.figure()
     ax = fig.add_subplot(111 , projection='3d')
-
     pos_dt['corr'] = ""
     # Adding the correlation columns into the genePos data Frame
     for gene_ref in correlation_dict:
@@ -155,8 +134,8 @@ def visualization_3D_mtp(position_file,correlation_dict):
     z = pos_dt.iloc[:,2].tolist()
     corr = pos_dt.iloc[:,3].tolist()
     # 3D VISUALIZATION
-    ax.scatter(x , y , z , c='r' , cmap = corr , marker = 'o')
-    ax.set_xlabel('X label') , ax.set_ylabel('Y label') , ax.set_zlabel('Z label')
+    ax.scatter(x, y, z, c='r', cmap = corr, marker = 'o')
+    ax.set_xlabel('X label'), ax.set_ylabel('Y label'), ax.set_zlabel('Z label')
     plt.show()
 
 

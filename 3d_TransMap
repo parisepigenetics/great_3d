@@ -19,8 +19,6 @@ parser.add_argument("-e", "--geneExpression-file", type=argparse.FileType('r'), 
 parser.add_argument("outfile", nargs='?', default="-", type=argparse.FileType('w'), metavar='output_file', help="Path to the outputfile of genes Dictionnary (or STDOUT).")
 parser.add_argument("-n", "--nb-genes", help="Select the number of the closest genes --DEFAULT = 10", type=int, default=10, dest="nGenes", metavar="noGenes")
 parser.add_argument("-c", "--method-correlation", help="Select the methode of correlation --DEFAULT = 'pearson'", type=str, default='pearson', dest="mCorr", metavar="methode_correlation")
-
-
 args = parser.parse_args()
 
 # Calculate the distance matrix
