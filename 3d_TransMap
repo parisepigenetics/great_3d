@@ -12,8 +12,6 @@ import multiepigenomics_3d as me3d
 import sys
 import pprint
 
-import vizualization as v3D
-
 parser = argparse.ArgumentParser(description="3D transcription map, main program.")
 # Positionnal argument containing the 3D coordinate of genes
 parser.add_argument("-p", "--positions-file", type=argparse.FileType('r'), help='Path to the file containing the x, y, z coordinates of genes', dest="genePos", metavar="genes_position_file")
@@ -27,7 +25,6 @@ args = parser.parse_args()
 
 # Calculate the distance matrix
 distanceMatrix = me3d.calculate_distance(args.genePos)
-args.genePos.close()
 
 # Populate the dictionary of sorted distances.
 sortedDict = me3d.sorting_distances(distanceMatrix)
@@ -38,19 +35,16 @@ sortedDict = me3d.sorting_distances(distanceMatrix)
 # Compute a dictionnary of the sum of correlations between each gene and the others.
 sum_Corr = me3d.sum_correlation(sortedDict, args.geneExpr, args.nGenes , args.mCorr)
 
-pprint.pprint(sum_Corr)
+#pprint.pprint(sum_Corr)
 
-''' visualization_3D '''
-args.genePos = open(args.genePos.name)
-
-''' Plotly '''
-me3d.visualization_3D_plotly(args.genePos , sum_Corr)
-
-''' Mathplotlib '''
-#me3d.visualization_3D_mtp(args.genePos , sum_Corr)
+# 3D visualization_3D
+# Plotly
+#me3d.visualization_3D_plotly(args.genePos , sum_Corr)
+# Mathplotlib
+me3d.visualization_3D_mtp(args.genePos , sum_Corr)
 
 
-'''The parrallelization is not working yet'''
+# The parrallelization is not working yet
 #sum_Corr_mp = me3d.sumCor_mp(sortedDict, args.geneExpr, args.nGenes)
 #print(sum_Corr_mp)
 

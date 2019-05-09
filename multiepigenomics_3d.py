@@ -16,13 +16,14 @@ from scipy.stats import pearsonr , kendalltau , spearmanr
 import plotly
 import plotly.plotly as py
 import plotly.graph_objs as go
-plotly.tools.set_credentials_file(username='miara1502', api_key='LM3BdwFIOFpJmq3DP6CQ')
+#plotly.tools.set_credentials_file(username='miara1502', api_key='LM3BdwFIOFpJmq3DP6CQ')
 # NOTE: we have to create an account to run the programm correctyl
 # NOTE: we can visualize the Plot on our own account
 
 from mpl_toolkits.mplot3d import Axes3D
 import matplotlib.pyplot as plt
 
+import pprint
 
 ## Nice wrapper to time functions. Works as a decorator.
 # Taken from https://stackoverflow.com/questions/5478351/python-time-measure-function
@@ -41,6 +42,7 @@ def calculate_distance(position_file):
     """Get a position file, return the distance matrix as a Pandas DataFrame.
     """
     df = pd.read_csv(position_file, sep='\t')
+    position_file.seek(0)
     geneNames = df.index
     ndarray = scipy.spatial.distance.pdist(df)
     matrix_uni = scipy.spatial.distance.squareform(ndarray)
@@ -68,6 +70,7 @@ def sum_correlation(sorted_dists, ge_file, no_genes , type_correlation):
     # Convert the GE data frame to a dictionary.
     geD = geDF.T.to_dict('list')
     correlation_sums = {}
+    #FIXME If a gene has zero expression we give it zero correlation immediately.
     # Here is the actual calculation.
     for gene_ref, closest_genes in sorted_dists.items():
         # TODO check if we gain time when we paralelise this for loop!
@@ -88,23 +91,21 @@ def sum_correlation(sorted_dists, ge_file, no_genes , type_correlation):
     return correlation_sums
 
 
-def visualization_3D_plotly(position_file,correlation_dict):
+def visualization_3D_plotly(position_file, correlation_dict):
     """Gets the dictionnary of the closest genes, the gene postion file and
     return a plot of the 3D gene correlation by using Plotly
     """
     pos_dt = pd.read_csv(position_file, sep='\t')
-    #dt = pd.read_csv('genesSchiz100_pos.txt', sep='\t')
-    pos_dt['corr'] = 'default value'
-    '''Adding the correlation columns into the genePos data Frame'''
+    pos_dt['corr'] = ""
+    # Adding the correlation columns into the genePos data Frame
     for gene_ref in correlation_dict:
         pos_dt['corr'][gene_ref] = correlation_dict[gene_ref]
-
     # Taken from https://plot.ly/python/3d-scatter-plots/ and adjusted with our values
-    ''' VISUALIZATION_3D '''
-    x = pos_dt[[0]]
-    y = pos_dt[[1]]
-    z = pos_dt[[2]]
-    corr = pos_dt[[3]]
+    # 3D VISUALIZATION_3D
+    x = pos_dt.iloc[:,0].tolist()
+    y = pos_dt.iloc[:,1].tolist()
+    z = pos_dt.iloc[:,2].tolist()
+    corr = pos_dt.iloc[:,3].tolist()
     trace1 = go.Scatter3d(
         x=x,
         y=y,
@@ -143,18 +144,17 @@ def visualization_3D_mtp(position_file,correlation_dict):
     fig = plt.figure()
     ax = fig.add_subplot(111 , projection='3d')
 
-    pos_dt['corr'] = 'default value'
-    '''Adding the correlation columns into the genePos data Frame'''
+    pos_dt['corr'] = ""
+    # Adding the correlation columns into the genePos data Frame
     for gene_ref in correlation_dict:
         pos_dt['corr'][gene_ref] = correlation_dict[gene_ref]
-
-    x = pos_dt[[0]]
-    y = pos_dt[[1]]
-    z = pos_dt[[2]]
-    corr = pos_dt[[3]]
-    ''' VISUALIZATION_3D'''
+    # Collect the values.
+    x = pos_dt.iloc[:,0].tolist()
+    y = pos_dt.iloc[:,1].tolist()
+    z = pos_dt.iloc[:,2].tolist()
+    corr = pos_dt.iloc[:,3].tolist()
+    # 3D VISUALIZATION
     ax.scatter(x , y , z , c='r' , cmap = corr , marker = 'o')
-
     ax.set_xlabel('X label') , ax.set_ylabel('Y label') , ax.set_zlabel('Z label')
     plt.show()
 
