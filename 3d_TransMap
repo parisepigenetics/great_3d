@@ -39,9 +39,9 @@ sum_Corr = me3d.sum_correlation(sortedDict, args.geneExpr, args.nGenes , args.mC
 
 # 3D visualization_3D
 # Plotly
-#me3d.visualization_3D_plotly(args.genePos , sum_Corr)
+me3d.visualization_3D_plotly(args.genePos , sum_Corr)
 # Mathplotlib
-me3d.visualization_3D_mtp(args.genePos , sum_Corr)
+#me3d.visualization_3D_mtp(args.genePos , sum_Corr)
 
 
 # The parrallelization is not working yet

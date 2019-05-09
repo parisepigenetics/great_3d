@@ -118,7 +118,8 @@ def visualization_3D_plotly(position_file, correlation_dict):
             size=6,
             color=corr,
             colorscale='Reds', # choose a colorscale
-            opacity=0.8
+            opacity=0.5 , # Transparency
+            showscale = True
         ),
         showlegend = False
     )
@@ -133,7 +134,7 @@ def visualization_3D_plotly(position_file, correlation_dict):
         )
     )
     fig = go.Figure(data=data, layout=layout)
-    py.iplot(fig, filename='3d-scatter-colorscale_3D_TRANSMAP')
+    py.iplot(fig, filename='3d-scatter-colorscale_3D_TRANSMAP_VISUALIZATION')
 
 
 def visualization_3D_mtp(position_file,correlation_dict):
