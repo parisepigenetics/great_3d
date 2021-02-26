@@ -7,7 +7,7 @@ genes Dctionnary file of the N closest Genes
 import argparse
 import pandas as pd
 
-import multiepigenomics_3d as me3d
+import multiEpigenomics3D as me3d
 
 import sys
 import pprint
@@ -36,7 +36,7 @@ sum_Corr = me3d.sum_correlation(sortedDict, args.geneExpr, args.nGenes , args.mC
 # 3D visualization_3D
 # Plotly
 #me3d.visualization_3D_plotly(args.genePos , sum_Corr , args.outfile)
-# Plotly with line 
+# Plotly with line
 me3d.visualization_3D_plotly_line(args.genePos , sum_Corr , args.outfile)
 
 
