@@ -118,7 +118,7 @@ def visualization_3D_plotly_line(position_file,correlation_dict, outfile_name):
     """Gets the dictionnary of the closest genes, the gene postion file and
     return an HTML outfile with a plot of the 3D gene correlation by using Plotly
     """
-    #NOTE : the programm isn t running when we use the file with the chromosome ,
+    #NOTE : the programm isn t running when we use the file with the chromosome,
     # The problem appears on the pdist ????
     pos_dt = pd.read_csv(position_file , sep ='\t')
     pos_dt['corr'] = ""
@@ -132,13 +132,14 @@ def visualization_3D_plotly_line(position_file,correlation_dict, outfile_name):
     corr = pos_dt.iloc[:,4].tolist()
     trace1 = go.Scatter3d(x=x, y=y, z=z, text = pos_dt.index,
     hoverinfo = 'text', mode='markers',
-    marker=dict(size=4, color=corr, colorscale='Reds', # choose a colorscale
-    opacity=0.5 , # Transparency
+    marker=dict(size=4, color=corr, colorscale='Rainbow', # choose a colorscale
+    opacity=0.75, # Transparency
     showscale = True),
     showlegend = False)
     #LINE PLOT
-    #Putting a none inside Y columns fwhen the chromosoe changes
-    #TODO find the number of the chromosomes, create the data list before and append a trace every time you have a new chromosome (you create the trace for ech chromosoem in a loop here.) Do something similar for the colour.
+    #Putting a none inside Y columns when the chromosoe changes
+    #TODO find the number of chromosomes, create the data list before and append a trace every time you have a new chromosome (you create the trace for ech chromosoem in a loop here.) Do something similar for the colour.
+    #TODO, fix the line BUG NOW!
     gap = []
     for i in range(len(pos_dt.index)-1) :
         if((pos_dt[' chr'][i]) != (pos_dt[' chr'][i+1])):
@@ -155,9 +156,9 @@ def visualization_3D_plotly_line(position_file,correlation_dict, outfile_name):
     corr = pos_dt.iloc[:,4].tolist()
     trace2 = go.Scatter3d(x=x2, y=y2, z=z2, text = pos_dt.index,
     hoverinfo = 'text', mode='lines',
-    line = dict(color = 'steelblue', ) ,
+    line = dict(color = 'steelblue', width=10),
     showlegend = False , connectgaps = False, opacity=0.5)
-    #TODO (PEHAPS it is possible to interpolate and create a curve instead of segments. check interpolate.interp2d(x, y, z, kind='cubic') from scipy.interpolate.
+    #TODO (Check the line.shape of plottly and it seems it does not allow. PEHAPS it is possible to interpolate and create a curve instead of segments. check interpolate.interp2d(x, y, z, kind='cubic') from scipy.interpolate.)
     data = [trace1, trace2]
     layout = go.Layout(margin=dict(l=0, r=0, b=0, t=0))
     fig = go.Figure(data=data, layout=layout)
