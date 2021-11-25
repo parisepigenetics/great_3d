@@ -49,7 +49,7 @@ def calculate_distance(position_file):
 
 
 def sorting_distances(dist_df):
-    '''Get a distance matrix (Pandas DataFrame) and return a dictionary of sorted genes with each gene as a key.
+    '''Take a distance matrix (Pandas DataFrame) and return a dictionary of sorted neighboring genes with each gene as a key.
     '''
     sortedDict = {}
     for gene_name in dist_df.index:
@@ -57,8 +57,8 @@ def sorting_distances(dist_df):
     return sortedDict
 
 
-def sum_correlation(sorted_dists, ge_file, no_genes , type_correlation):
-    """Gets the dictionnary of the closest genes, the gene expression file and the number of genes we need to compute correlation.
+def sum_correlation(dists_sorted, ge_file, no_genes , correlation_type):
+    """Take the dictionnary of the closest genes, the gene expression file and the number of genes we need to compute correlation.
     Return a dictionnary of the sum of correlations for each gene
     """
     # Read the GE file
@@ -68,18 +68,18 @@ def sum_correlation(sorted_dists, ge_file, no_genes , type_correlation):
     correlation_sums = {}
     #FIXME If a gene has zero expression we give it zero correlation immediately.
     # Here is the actual calculation.
-    for gene_ref, closest_genes in sorted_dists.items():
+    for gene_ref, closest_genes in dists_sorted.items():
         # TODO check if we gain time when we paralelise this for loop!
         selected_genes = list(closest_genes[1:no_genes + 1].index)
         ref_GE = geD[gene_ref]
-        if(type_correlation == 'pearson'):
+        if(correlation_type == 'pearson'):
             correlations = [abs(pearsonr(ref_GE, geD[s])[0]) for s in selected_genes]
-        elif(type_correlation == 'kendall'):
+        elif(correlation_type == 'kendall'):
             correlations = [abs(kendalltau(ref_GE, geD[s])[0]) for s in selected_genes]
-        elif(type_correlation == 'spearman'):
+        elif(correlation_type == 'spearman'):
             correlations = [abs(spearmanr(ref_GE, geD[s])[0]) for s in selected_genes]
         # NOTE in case we need to use the absolute values we can flip to that.  correlations = [abs(pearsonr(ref_GE, geD[s])[0]) for s in selected_genes]
-        # NOTE The pearsonr method returns the p-value for a 2 tauiled-correlation test, so perhpas we can use it in a later analysis.
+        # NOTE Each method returns the p-value for a 2 taill-correlation test, so perhpas we can use it in a later analysis.
         # TODO the function need to be modular in the sense that we can pass different correlation functions to it. Perhaps use decorators.
         correlations = np.nan_to_num(correlations)
         sum_correlation = sum(correlations)
@@ -87,38 +87,62 @@ def sum_correlation(sorted_dists, ge_file, no_genes , type_correlation):
     return correlation_sums
 
 
-def visualization_3D_plotly(position_file, correlation_dict, outfile_name):
-    """Gets the dictionnary of the closest genes, the gene postion file and
-    return an HTML outfile with a plot of the 3D gene correlation by using Plotly
+def visualization_3D_plotly(position_file, correlation_dict, outfile_name, autoopen = True):
+    """Take correlation dictionnary, gene postion file.
+    Return HTML outfile with an interactive plot of the 3D gene correlation
     """
     pos_dt = pd.read_csv(position_file, sep='\t')
-    pos_dt['corr'] = ""
-    # Adding the correlation columns into the genePos data Frame
+    pos_dt['Corr'] = ""
+    # Adding the correlation column into the DataFrame
     for gene_ref in correlation_dict:
-        pos_dt['corr'][gene_ref] = correlation_dict[gene_ref]
-    # Taken from https://plot.ly/python/3d-scatter-plots/ and adjusted with our values
-    # 3D VISUALIZATION_3D
-    x = pos_dt.iloc[:,0].tolist()
-    y = pos_dt.iloc[:,1].tolist()
-    z = pos_dt.iloc[:,2].tolist()
-    corr = pos_dt.iloc[:,3].tolist()
-    trace1 = go.Scatter3d(x=x, y=y, z=z, text = pos_dt.index,
-    hoverinfo = 'text', mode='markers',
-    marker=dict(size=4, color=corr, colorscale='Reds', # choose a colorscale
-    opacity=0.5 , # Transparency
-    showscale = True),
-    showlegend = False)
-    data = [trace1]
-    layout = go.Layout(margin=dict(l=0, r=0, b=0, t=0))
+        pos_dt.loc[gene_ref, 'Corr'] = correlation_dict[gene_ref]
+    # Get the coordinates and the ploting vaiable(s)
+    x = pos_dt.loc[:,"X"].tolist()
+    y = pos_dt.loc[:,"Y"].tolist()
+    z = pos_dt.loc[:,"Z"].tolist()
+    corr = pos_dt.loc[:,"Corr"].tolist()
+    corr2 = [x**2 for x in corr]
+    # Construct the hover text list
+    htext = [f"{n}<br>{c:3f}" for n, c in zip(pos_dt.index,  corr)]
+    htext2 = [f"{n}<br>{c:3f}" for n, c in zip(pos_dt.index,  corr2)]
+    # Construct the trace(s)
+    trace1 = go.Scatter3d(x=x, y=y, z=z, name = "Correlation",
+    hoverinfo="text", hovertext = htext, mode='markers',
+    marker=dict(size=3, color=corr, colorscale='Portland', cmin =1, cmax = max(corr), opacity=0.67, showscale=True),
+    showlegend=True)
+    trace2 = go.Scatter3d(x=x, y=y, z=z, name = "Correlation2",
+    hoverinfo="text", hovertext = htext2, mode='markers',
+    marker=dict(size=3, color=corr2, colorscale='Portland', cmin =2, cmax = max(corr2), opacity=0.67, showscale=True),
+    showlegend=True)
+    # Combine multiple tracks
+    data = [trace1, trace2]
+    # Set layout elements, size, margins, legend(s)
+    layout = go.Layout(plot_bgcolor="#FFF", autosize=False, width=1600, height=1200,
+    margin=dict(l=1, r=1, b=1, t=50),  # leave a small margin to the right for the modebar
+    legend=dict(yanchor="top", y=0.99, xanchor="left", x=0.1),
+    title_text="GREAT 3D transcriptome", title_x=0.5,
+    modebar={'orientation':'h', 'bgcolor':'salmon', 'color':'white', 'activecolor': '#9ED3CD'})
+    # Actual construction of the graph
     fig = go.Figure(data=data, layout=layout)
-    return plotly.offline.plot(fig, filename = outfile_name, auto_open=True)
+    # Remove the axis projections (i.e. spikes) and do other things with axes
+    fig.update_scenes(xaxis_spikethickness=1, yaxis_spikethickness=1, zaxis_spikethickness=1,
+    xaxis_spikesides=False, yaxis_spikesides=False, zaxis_spikesides=False,
+    xaxis_spikecolor="#666", yaxis_spikecolor="#666", zaxis_spikecolor="#666",
+    xaxis_title="X", yaxis_title="Y", zaxis_title="Z",
+    xaxis_backgroundcolor="rgb(255, 255, 255)", yaxis_backgroundcolor="rgb(255, 255, 255)", zaxis_backgroundcolor="rgb(255, 255, 255)",
+    xaxis_gridcolor="#ccc", yaxis_gridcolor="#ccc", zaxis_gridcolor="#ccc")
+    # Set the grid colour and lines
+    #fig.update_xaxes(showline=True, linewidth=2, linecolor='black', gridcolor='white')
+    return plotly.offline.plot(fig, filename = outfile_name, auto_open=autoopen, config={'displaylogo':False})
+
+
 
 
 def visualization_3D_plotly_line(position_file,correlation_dict, outfile_name):
     """Gets the dictionnary of the closest genes, the gene postion file and
     return an HTML outfile with a plot of the 3D gene correlation by using Plotly
     """
-    #NOTE : the programm isn t running when we use the file with the chromosome,
+    # FIXME the programm isn't running when we use the file with the chromosome,
     # The problem appears on the pdist ????
     pos_dt = pd.read_csv(position_file , sep ='\t')
     pos_dt['corr'] = ""
@@ -132,14 +156,14 @@ def visualization_3D_plotly_line(position_file,correlation_dict, outfile_name):
     corr = pos_dt.iloc[:,4].tolist()
     trace1 = go.Scatter3d(x=x, y=y, z=z, text = pos_dt.index,
     hoverinfo = 'text', mode='markers',
-    marker=dict(size=4, color=corr, colorscale='Rainbow', # choose a colorscale
-    opacity=0.75, # Transparency
-    showscale = True),
-    showlegend = False)
+    marker=dict(size=4, color=corr, colorscale='Reds',  # choose a colorscale
+    opacity=0.5,  # Transparency
+    showscale = False),
+    showlegend = True)
     #LINE PLOT
     #Putting a none inside Y columns when the chromosoe changes
-    #TODO find the number of chromosomes, create the data list before and append a trace every time you have a new chromosome (you create the trace for ech chromosoem in a loop here.) Do something similar for the colour.
-    #TODO, fix the line BUG NOW!
+    #TODO find the number of chromosomes, create the data list before and append a trace every time you have a new chromosome (you create the trace for each chromosoem in a loop here.) Do something similar for the colour.
+    #FIXME fix the line BUG for multi-chromosomes NOW!
     gap = []
     for i in range(len(pos_dt.index)-1) :
         if((pos_dt[' chr'][i]) != (pos_dt[' chr'][i+1])):
@@ -156,11 +180,12 @@ def visualization_3D_plotly_line(position_file,correlation_dict, outfile_name):
     corr = pos_dt.iloc[:,4].tolist()
     trace2 = go.Scatter3d(x=x2, y=y2, z=z2, text = pos_dt.index,
     hoverinfo = 'text', mode='lines',
-    line = dict(color = 'steelblue', width=10),
-    showlegend = False , connectgaps = False, opacity=0.5)
+    line = dict(color = 'steelblue', width=5),
+    showlegend = False , connectgaps = True, opacity=0.5)
     #TODO (Check the line.shape of plottly and it seems it does not allow. PEHAPS it is possible to interpolate and create a curve instead of segments. check interpolate.interp2d(x, y, z, kind='cubic') from scipy.interpolate.)
     data = [trace1, trace2]
-    layout = go.Layout(margin=dict(l=0, r=0, b=0, t=0))
+    layout = go.Layout(margin=dict(l=0, r=0, b=0, t=0), legend=dict(yanchor="top", y=0.99, xanchor="left",
+    x=0.01))
     fig = go.Figure(data=data, layout=layout)
     return plotly.offline.plot(fig, filename = outfile_name, auto_open=False)
 
@@ -177,19 +202,19 @@ def visualization_3D_mtp(position_file,correlation_dict):
     for gene_ref in correlation_dict:
         pos_dt['corr'][gene_ref] = correlation_dict[gene_ref]
     # Collect the values.
-    x = pos_dt.iloc[:,0].tolist()
-    y = pos_dt.iloc[:,1].tolist()
-    z = pos_dt.iloc[:,2].tolist()
-    corr = pos_dt.iloc[:,3].tolist()
+    x = pos_dt.iloc[:,1].tolist()
+    y = pos_dt.iloc[:,2].tolist()
+    z = pos_dt.iloc[:,3].tolist()
+    corr = pos_dt.iloc[:,4].tolist()
     # 3D VISUALIZATION
     ax.scatter(x, y, z, c='r', cmap = corr, marker = 'o')
-    ax.set_xlabel('X label'), ax.set_ylabel('Y label'), ax.set_zlabel('Z label')
+    ax.set_xlabel('X'), ax.set_ylabel('Y'), ax.set_zlabel('Z')
     plt.show()
 
 
 
-
-#================ OBSOLETE functions ======================
+###############################################################################
+#=================================== OBSOLETE functions ======================#
 def sumCor_mp(sorted_dists, ge_file, no_genes , type_correlation) :
     cpus = cpu_count() - 1
     dict = {}
