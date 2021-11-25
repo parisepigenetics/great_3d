@@ -36,9 +36,9 @@ sum_Corr = me3d.sum_correlation(sortedDict, args.geneExpr, args.nGenes, args.mCo
 
 # 3D visualization_3D
 # Plotly
-#me3d.visualization_3D_plotly(args.genePos , sum_Corr , args.outfile)
+me3d.visualization_3D_plotly(args.genePos , sum_Corr , args.outfile)
 # Plotly with line
-me3d.visualization_3D_plotly_line(args.genePos , sum_Corr , args.outfile)
+#me3d.visualization_3D_plotly_line(args.genePos , sum_Corr , args.outfile)
 
 # Mathplotlib
 #me3d.visualization_3D_mtp(args.genePos , sum_Corr)
@@ -49,3 +49,4 @@ me3d.visualization_3D_plotly_line(args.genePos , sum_Corr , args.outfile)
 
 # TODO: 1. FOLLOW the ToDos in the library file.
 #       2. Start the 3D visualisation with plotly!
+#       3. NOW make it a DASH application!
