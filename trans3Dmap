@@ -1,52 +1,49 @@
 #!/usr/bin/env python3
 
-"""Program to execute the 3D-transcriptome-map.
+"""Program to compute and visualise a 3D-transcriptome map.
 
-Takes a 3D gene positions file and a gene expression matrix computes the spatial correlatio and report an interactive graph of the spatial gene expression correlation.
+Take a 3D gene positions file and a gene expression matrix, compute spatial correlation and visualise an interactive 3D graph of the spatial gene expression correlation.
 """
 
 import argparse
-import pandas as pd
 
+# Import the package main module
 import multiEpigenomics3D as me3d
 
-import sys
-import pprint
-
+# Command line arguments parsing
 parser = argparse.ArgumentParser(description="3D transcription map, main program.")
-# Positionnal argument containing the 3D coordinate of genes
-parser.add_argument("-p", "--positions-file", type=argparse.FileType('r'), help='Path to the file containing the x, y, z coordinates of genes.', dest="genePos", metavar="genes_position_table")
+# Declre command line arguments
+parser.add_argument("-p", "--positions-file", type=argparse.FileType('r'), help='Path to the file containing chromosome names and x, y, z coordinates of genes.', dest="genePos", metavar="genes_position_table")
 parser.add_argument("-e", "--geneExpression-file", type=argparse.FileType('r'), help='Path to the file containing the gene expression.', dest="geneExpr", metavar="gene_expression_matrix")
 parser.add_argument("outfile", nargs='?', default="-", metavar='html_file', help="Path to the output file of the 3D_visualization (or STDOUT), must be an html file.")
 parser.add_argument("-n", "--nb-genes", help="Define number of the neighbour genes. (DEFAULT = 10).", type=int, default=10, dest="nGenes", metavar="noGenes")
 parser.add_argument("-c", "--method-correlation", help="Define correlation method. (DEFAULT = 'pearson').", type=str, default='pearson', dest="mCorr", metavar="correlation_method")
+# Generate the options-arguments object
 args = parser.parse_args()
 
 # Calculate the distance matrix
+# FIXME Find faster ways to compute that!
 distanceMatrix = me3d.calculate_distance(args.genePos)
 
 # Populate the dictionary of sorted distances.
 sortedDict = me3d.sorting_distances(distanceMatrix)
 
+# FIXME The paralelised code does not work faster and it does freeze the machine for large genomes.
 #sortedDict = me3d.sorting_dists_parallel(distanceMatrix)
-# NOTE: The paralelised code does not work faster and it does freeze the machine for large genomes.
 
 # Compute a dictionnary of the sum of correlations between each gene and its neighbours.
 sum_Corr = me3d.sum_correlation(sortedDict, args.geneExpr, args.nGenes, args.mCorr)
-
-# 3D visualization_3D
-# Plotly
-me3d.visualization_3D_plotly(args.genePos , sum_Corr , args.outfile)
-# Plotly with line
-#me3d.visualization_3D_plotly_line(args.genePos , sum_Corr , args.outfile)
-
-# Mathplotlib
-#me3d.visualization_3D_mtp(args.genePos , sum_Corr)
-
 # The parrallelization is not working yet
 #sum_Corr_mp = me3d.sumCor_mp(sortedDict, args.geneExpr, args.nGenes)
 #print(sum_Corr_mp)
 
-# TODO: 1. FOLLOW the ToDos in the library file.
-#       2. Start the 3D visualisation with plotly!
-#       3. NOW make it a DASH application!
+# 3D visualization with Plotly
+me3d.visualization_3D_plotly(args.genePos , sum_Corr , args.outfile)
+# TODO: NOW make it a DASH application!
+
+
+
+# Mathplotlib  # OBSOLETE
+#me3d.visualization_3D_mtp(args.genePos , sum_Corr)
+# Plotly with line  # OBSOLETE
+#me3d.visualization_3D_plotly_line(args.genePos , sum_Corr , args.outfile)
