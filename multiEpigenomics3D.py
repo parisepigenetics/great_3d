@@ -31,7 +31,7 @@ def timing(f):
 ## Actual functions
 def calculate_distance(position_file):
     # TODO parallelise the calculation of the distance matrix.
-    """Get a position file, return the distance matrix as a Pandas DataFrame.
+    """Take a genes position file, return the distance matrix as a Pandas DataFrame.
     """
     df = pd.read_csv(position_file, sep='\t')
     position_file.seek(0)
@@ -47,7 +47,7 @@ def calculate_distance(position_file):
 
 
 def sorting_distances(dist_df):
-    '''Take a distance matrix (Pandas DataFrame) and return a dictionary of sorted neighboring genes with each gene as a key.
+    '''Take a genes distance matrix (Pandas DataFrame), return a dictionary of sorted genes by distance with each gene as a key.
     '''
     sortedDict = {}
     for gene_name in dist_df.index:
@@ -56,8 +56,9 @@ def sorting_distances(dist_df):
 
 
 def sum_correlation(dists_sorted, ge_file, no_genes , correlation_type):
-    """Take the dictionnary of the closest genes, the gene expression file and the number of genes we need to compute correlation.
-    Return a dictionnary of the sum of correlations for each gene
+    """Take the dictionnary of the closest genes, the gene expression file, the number of genes we need to compute correlation and the correlation type.
+
+    Return two dictionnaries: One wit the sum of correlations and one with the sum of absolute correlations for each gene
     """
     # Read the GE file
     geDF = pd.read_csv(ge_file, sep='\t')
@@ -70,6 +71,7 @@ def sum_correlation(dists_sorted, ge_file, no_genes , correlation_type):
         # TODO check if we gain time when we paralelise this for loop!
         selected_genes = list(closest_genes[1:no_genes + 1].index)
         ref_GE = geD[gene_ref]
+        # Select the desired correlation.
         if(correlation_type == 'pearson'):
             correlationA = [abs(pearsonr(ref_GE, geD[s])[0]) for s in selected_genes]
             correlation = [pearsonr(ref_GE, geD[s])[0] for s in selected_genes]
@@ -91,7 +93,8 @@ def sum_correlation(dists_sorted, ge_file, no_genes , correlation_type):
 
 def visualization_3D_plotly(position_file, correlation_dict, outfile_name, autoopen = True):
     """Take correlation dictionnary, gene postion file.
-    Return HTML outfile with an interactive plot of the 3D gene correlation
+
+    Return HTML outfile with an interactive plot of the 3D gene correlation.
     """
     pos_dt = pd.read_csv(position_file, sep='\t')
     pos_dt['Corr'] = ""
@@ -165,6 +168,7 @@ def visualization_3D_plotly(position_file, correlation_dict, outfile_name, autoo
 
 
 
+
 ###############################################################################
 #=================================== OBSOLETE functions ======================#
 ###############################################################################
@@ -194,8 +198,8 @@ def visualization_3D_plotly_line(position_file,correlation_dict, outfile_name):
     showlegend = True)
     #LINE PLOT
     #Putting a none inside Y columns when the chromosoe changes
-    #TODO find the number of chromosomes, create the data list before and append a trace every time you have a new chromosome (you create the trace for each chromosoem in a loop here.) Do something similar for the colour.
-    #FIXME fix the line BUG for multi-chromosomes NOW!
+    # find the number of chromosomes, create the data list before and append a trace every time you have a new chromosome (you create the trace for each chromosoem in a loop here.) Do something similar for the colour.
+    # fix the line BUG for multi-chromosomes NOW!
     gap = []
     for i in range(len(pos_dt.index)-1) :
         if((pos_dt[' chr'][i]) != (pos_dt[' chr'][i+1])):
@@ -244,7 +248,7 @@ def visualization_3D_mtp(position_file,correlation_dict):
     ax.set_xlabel('X'), ax.set_ylabel('Y'), ax.set_zlabel('Z')
     plt.show()
 
-# AOLD FUNCTIONS for calculations
+# OLD FUNCTIONS for calculations
 def sumCor_mp(sorted_dists, ge_file, no_genes , type_correlation) :
     cpus = cpu_count() - 1
     dict = {}
