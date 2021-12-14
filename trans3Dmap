@@ -6,13 +6,15 @@ Take a 3D gene positions file and a gene expression matrix, compute spatial corr
 """
 
 import argparse
-
+import dash
+from dash import dcc
+from dash import html
 # Import the package main module
 import multiEpigenomics3D as me3d
 
 # Command line arguments parsing
 parser = argparse.ArgumentParser(description="3D transcription map, main program.")
-# Declre command line arguments
+# Declare command line arguments
 parser.add_argument(
     "-p",
     "--positions-file",
@@ -29,13 +31,14 @@ parser.add_argument(
     dest="geneExpr",
     metavar="gene_expression_matrix",
 )
-parser.add_argument(
-    "outfile",
-    nargs="?",
-    default="-",
-    metavar="html_file",
-    help="Path to the output file of the 3D_visualization (or STDOUT), must be an html file.",
-)
+## Dash application development, no need for an outfile
+#parser.add_argument(
+#    "outfile",
+#    nargs="?",
+#    default="-",
+#    metavar="html_file",
+#    help="Path to the output file of the 3D_visualization (or STDOUT), must be an html file.",
+#)
 parser.add_argument(
     "-n",
     "--nb-genes",
@@ -74,9 +77,16 @@ sum_Corr = me3d.sum_correlation(sortedDict, args.geneExpr, args.nGenes, args.mCo
 # print(sum_Corr_mp)
 
 # 3D visualization with Plotly
-me3d.visualization_3D_plotly(args.genePos, sum_Corr, args.outfile)
-# TODO: NOW make it a DASH application!
+fig = me3d.visualise_3D_plotly(args.genePos, sum_Corr)
+## OLD from plotly: plotly.offline.plot(fig, filename=outfile_name, auto_open=autoopen, config={"displaylogo": False})
 
+# Simple Dash
+app = dash.Dash(__name__)
+app.layout = html.Div(children=[html.H1(children='GREAT 3D transcriptome map'), html.Div(children='P. falciparum 3D genome'), dcc.Graph(id='dash_GREAT', figure=fig)])
+#TODO Enrich the Dash application with, controls (radio buttons, sliders, etc.), input files and progress bars!!!
+
+if __name__ == '__main__':
+    app.run_server(debug=True)
 
 # Mathplotlib  # OBSOLETE
 # me3d.visualization_3D_mtp(args.genePos , sum_Corr)
