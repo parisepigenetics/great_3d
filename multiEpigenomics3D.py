@@ -95,10 +95,10 @@ def sum_correlation(dists_sorted, ge_file, no_genes, correlation_type):
     return correlation_sums
 
 
-def visualization_3D_plotly(position_file, correlation_dict, outfile_name, autoopen=True):
+def visualise_3D_plotly(position_file, correlation_dict):
     """Take correlation dictionnary, gene postion file.
 
-    Return HTML outfile with an interactive plot of the 3D gene correlation.
+    Return plotly interactive figure of the 3D gene correlation(s).
     """
     pos_dt = pd.read_csv(position_file, sep="\t")
     pos_dt["Corr"] = ""
@@ -158,7 +158,7 @@ def visualization_3D_plotly(position_file, correlation_dict, outfile_name, autoo
             x=xc,
             y=yc,
             z=zc,
-            name=chr,
+            name=ch,
             hoverinfo="text",
             mode="lines",
             opacity=0.8,
@@ -176,8 +176,8 @@ def visualization_3D_plotly(position_file, correlation_dict, outfile_name, autoo
         height=1200,
         margin=dict(l=1, r=1, b=1, t=50),
         legend=dict(yanchor="top", y=0.99, xanchor="left", x=0.1),
-        title_text="GREAT 3D transcriptome",
-        title_x=0.5,
+        #title_text="GREAT 3D transcriptome",
+        #title_x=0.5,
         modebar={"orientation": "h", "bgcolor": "salmon", "color": "white", "activecolor": "#9ED3CD"},
     )
     # Actual construction of the graph
@@ -204,4 +204,4 @@ def visualization_3D_plotly(position_file, correlation_dict, outfile_name, autoo
         zaxis_gridcolor="#ccc",
     )
     # fig.update_xaxes(showline=True, linewidth=2, linecolor='black', gridcolor='white')
-    return plotly.offline.plot(fig, filename=outfile_name, auto_open=autoopen, config={"displaylogo": False})
+    return fig
