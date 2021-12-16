@@ -1,6 +1,14 @@
-# 3D Transcriptome Map
+# GREAT 3d
 
-A tool for the analysis and visualisation of correlations between 3D genome architecture, transcription and epigenetics.
+## The Genome Regulatory Epigenetics Tools 3D.
+==============================
+[//]: # (Badges)
+[![GitHub Actions Build Status](https://github.com/REPLACE_WITH_OWNER_ACCOUNT/great_3d/workflows/CI/badge.svg)](https://github.com/REPLACE_WITH_OWNER_ACCOUNT/great_3d/actions?query=workflow%3ACI)
+[![codecov](https://codecov.io/gh/REPLACE_WITH_OWNER_ACCOUNT/great_3D/branch/master/graph/badge.svg)](https://codecov.io/gh/REPLACE_WITH_OWNER_ACCOUNT/great_3D/branch/master)
+
+A software suite for multi-3D (epi)genomics
+
+Suite of tools to analyse and visualise 3D genome architecture, transcription and epigenetics.
 
 ## Installation
 
@@ -16,10 +24,18 @@ To test the software with 100 plasmodium genes run:
 Then an html file with the plotly graphic will be generated in the current folder.
 
 
-## Credits
+
+### Copyright
+
+Copyright (c) 2015-2021, Costas Bouyioukos
 
 
-###### Repository history.
+#### Acknowledgements
+ 
+Project based on the 
+[Computational Molecular Science Python Cookiecutter](https://github.com/molssi/cookiecutter-cms) version 1.6.
+
+
 Several students have contributed code in the initial stages of the project.
 
 - First of all Miara Rakotomavo's M1 internship. Code into dev_Miara directory on dev_students branch.
