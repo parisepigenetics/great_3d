@@ -1,8 +1,7 @@
 # GREAT 3D
-
-## The Genome Regulatory Epigenetics Tools on 3D.
-[![GitHub Actions Build Status](https://github.com/cbouyio/great_3d/workflows/CI/badge.svg)](https://github.com/cbouyio/great_3d/actions?query=workflow%3ACI)
+[![GitHub Actions Build Status](https://github.com/cbouyio/parisepigenetics/workflows/CI/badge.svg)](https://github.com/parisepigenetics/great_3d/actions?query=workflow%3ACI)
 [![codecov](https://codecov.io/gh/REPLACE_WITH_OWNER_ACCOUNT/great_3D/branch/master/graph/badge.svg)](https://codecov.io/gh/REPLACE_WITH_OWNER_ACCOUNT/great_3D/branch/master)
+## The Genome Regulatory Epigenetics Tools on 3D
 
 A software suite for multi-3D (epi)genomics
 
@@ -14,9 +13,9 @@ Suite of tools to analyse and visualise 3D genome architecture, transcription an
 - [ ] Generate a proper python package structure.
 
 ## Usage
-To test the software with 100 plasmodium genes run:
+To test the software with 1000 plasmodium genes run:
 ```
-./trans3Dmap -p test/genePositions100.tab -e test/geneExpression100.tab
+./trans3Dmap -p test/genePositions1000.tab -e test/geneExpression1000.tab
 ```
 Then a Dash application will launch on your local machine a you can access it by pointing your browser at http://127.0.0.1:8050/
 
@@ -24,14 +23,13 @@ Then a Dash application will launch on your local machine a you can access it by
 
 ### Copyright
 
-Copyright (c) 2015-2021, Costas Bouyioukos
+Copyright (c) 2015-2021, Costas Bouyioukos, Universite de Paris et UMR7216
 
 
 #### Acknowledgements
 
 Project based on the
 [Computational Molecular Science Python Cookiecutter](https://github.com/molssi/cookiecutter-cms) version 1.6.
-
 
 Several students have contributed code in the initial stages of the project.
 
