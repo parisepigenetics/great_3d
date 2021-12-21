@@ -9,8 +9,9 @@ import argparse
 import dash
 from dash import dcc
 from dash import html
-# Import the package main module
-import multiEpigenomics3D as me3d
+# Import package specific py_modules
+import great_3d.transcriptome_3d as gtr3d
+
 
 # Command line arguments parsing
 parser = argparse.ArgumentParser(description="3D transcription map, main program.")
@@ -62,22 +63,22 @@ args = parser.parse_args()
 
 # Calculate the distance matrix
 # FIXME Find faster ways to compute that!
-distanceMatrix = me3d.calculate_distance(args.genePos)
+distanceMatrix = gtr3d.calculate_distance(args.genePos)
 
 # Populate the dictionary of sorted distances.
-sortedDict = me3d.sorting_distances(distanceMatrix)
+sortedDict = gtr3d.sorting_distances(distanceMatrix)
 
 # FIXME The paralelised code does not work faster and it does freeze the machine for large genomes.
 # sortedDict = me3d.sorting_dists_parallel(distanceMatrix)
 
 # Compute a dictionnary of the sum of correlations between each gene and its neighbours.
-sum_Corr = me3d.sum_correlation(sortedDict, args.geneExpr, args.nGenes, args.mCorr)
+sum_Corr = gtr3d.sum_correlation(sortedDict, args.geneExpr, args.nGenes, args.mCorr)
 # The parrallelization is not working yet
 # sum_Corr_mp = me3d.sumCor_mp(sortedDict, args.geneExpr, args.nGenes)
 # print(sum_Corr_mp)
 
 # 3D visualization with Plotly
-fig = me3d.visualise_3D_plotly(args.genePos, sum_Corr)
+fig = gtr3d.visualise_3D_plotly(args.genePos, sum_Corr)
 ## OLD from plotly: plotly.offline.plot(fig, filename=outfile_name, auto_open=autoopen, config={"displaylogo": False})
 
 # Simple Dash
