@@ -2,6 +2,7 @@
 great_3D
 The GREAT 3D package for multi-3D (epi)genomics.
 """
+
 import sys
 from setuptools import setup, find_packages
 import versioneer
@@ -51,9 +52,8 @@ setup(
     #            'Mac OS-X',
     #            'Unix',
     #            'Windows'],            # Valid platforms your code works on, adjust to your flavor
-    # python_requires=">=3.5",          # Python version restrictions
+    python_requires=">=3.5",          # Python version restrictions
 
     # Manual control if final package is compressible or not, set False to prevent the .egg from being made
     # zip_safe=False,
-
 )
