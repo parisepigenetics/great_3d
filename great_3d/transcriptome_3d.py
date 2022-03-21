@@ -7,7 +7,7 @@ import scipy
 from multiprocessing import cpu_count, Pool, Process
 from functools import partial
 from scipy.spatial import distance_matrix
-from scipy.stats import pearsonr, kendalltau, spearmanr
+from scipy import stats
 import plotly
 import plotly.graph_objs as go
 
@@ -54,7 +54,7 @@ def sorting_distances(dist_df):
     """
     sortedDict = {}
     for gene_name in dist_df.index:
-        sortedDict[gene_name] = dist_df[gene_name].sort_values()
+        sortedDict[gene_name] = dist_df.loc[gene_name,:].sort_values()
     return sortedDict
 
 
@@ -78,13 +78,13 @@ def sum_correlation(dists_sorted, ge_file, no_genes, correlation_type):
         # Select the desired correlation.
         if correlation_type == "pearson":
             #correlationA = [abs(pearsonr(ref_GE, geD[s])[0]) for s in selected_genes]
-            correlation = [pearsonr(ref_GE, geD[s])[0] for s in selected_genes]
+            correlation = [stats.pearsonr(ref_GE, geD[s])[0] for s in selected_genes]
         elif correlation_type == "kendall":
             #correlationA = [abs(kendalltau(ref_GE, geD[s])[0]) for s in selected_genes]
-            correlation = [kendalltau(ref_GE, geD[s])[0] for s in selected_genes]
+            correlation = [stats.kendalltau(ref_GE, geD[s])[0] for s in selected_genes]
         elif correlation_type == "spearman":
             #correlationA = [abs(spearmanr(ref_GE, geD[s])[0]) for s in selected_genes]
-            correlation = [spearmanr(ref_GE, geD[s])[0] for s in selected_genes]
+            correlation = [stats.spearmanr(ref_GE, geD[s])[0] for s in selected_genes]
         # NOTE Each method returns the p-value for a 2 taill-correlation test, so perhpas we can use it in a later analysis
         # TODO the function need to be modular in the sense that we can pass different correlation functions to it. Perhaps use decorators
         correlation = np.nan_to_num(correlation)
@@ -95,7 +95,7 @@ def sum_correlation(dists_sorted, ge_file, no_genes, correlation_type):
     return correlation_sums
 
 
-def generate_genome_3D(genome_coords_file, position_file, correlation_dict):
+def generate_genome_3D(genome_coords_file, position_file, correlation_dict, user_genes):
     """Generate the trace for the 3D genome.
     Genome coordinates file should contain a column named "chr" with the different chromosome names
 
@@ -114,14 +114,14 @@ def generate_genome_3D(genome_coords_file, position_file, correlation_dict):
         # Take the dataframe slice that corresponds to each chromosome
         dfChrom = pos_dt[pos_dt["chr"] == ch]
         traceChr = go.Scatter3d(
-            x=dfChrom["X"],
-            y=dfChrom["Y"],
-            z=dfChrom["Z"],
+            x=dfChrom.loc[:,"X"],
+            y=dfChrom.loc[:,"Y"],
+            z=dfChrom.loc[:,"Z"],
             name=ch,
             hoverinfo="text",
             mode="lines",
             opacity=0.5,
-            line=dict(width=4, color=colors[i]),
+            line=dict(width=3, color=colors[i]),
             showlegend=True)
         traces.append(traceChr)
     ## Generate the genes traces
@@ -138,45 +138,112 @@ def generate_genome_3D(genome_coords_file, position_file, correlation_dict):
     # Construct the hover text list
     htext = [f"{n}<br>{m}<br>{c:3f}<br>{s}" for n, m, c, s in zip(pos_df.index, chroms, corr, nearGenes)]
     htextA = [f"{n}<br>{m}<br>{c:3f}<br>{s}" for n, m, c, s in zip(pos_df.index, chroms, corrA, nearGenes)]
-    ## Construct the orrelation traces
-    X = pos_df["X"]
-    Y = pos_df["Y"]
-    Z = pos_df["Z"]
+    ## Construct the correlation traces
+    X = pos_df.loc[:,"X"]
+    Y = pos_df.loc[:,"Y"]
+    Z = pos_df.loc[:,"Z"]
     ## Correlation trace
     traceCorr = go.Scatter3d(
         x=X,
         y=Y,
         z=Z,
+        ids=pos_df.index.values,
         name="Corr",
         hoverinfo="text",
         hovertext=htext,
         mode="markers",
-        opacity=0.75,
-        marker=dict(size=3, color=corr, colorscale="RdYlBu_r", showscale=True),
+        opacity=0.7,
+        marker=dict(size=4, color=corr, colorscale="RdYlBu_r", showscale=True),
         showlegend=True)
+    traces.append(traceCorr)
     ## Absolute correlation trace
     traceCorrA = go.Scatter3d(
         x=X,
         y=Y,
         z=Z,
+        ids=pos_df.index.values,
         name="CorrABS",
         visible='legendonly',
         hoverinfo="text",
         hovertext=htextA,
         mode="markers",
-        opacity=0.75,
-        marker=dict(size=3, color=corrA, colorscale="Hot_r", showscale=True),
+        opacity=0.7,
+        marker=dict(size=4, color=corrA, colorscale="Hot_r", showscale=True),
         showlegend=True)
-    traces.append(traceCorr)
     traces.append(traceCorrA)
     ## Extra traces
     # Significant correlation trace
-    #signifGenes = get_significant_corr_genes(correlation_dict)
+    signifGenes = get_significant_corr_genes(correlation_dict)
+    posDF_sign = pos_df.loc[signifGenes,:]
+    nearGenes = []
+    for gene_ref in signifGenes:
+        posDF_sign.loc[gene_ref, "Corr"] = correlation_dict[gene_ref][0]
+        # Append the list of selectes genes with a string
+        nearGenes.append('<br>'.join(correlation_dict[gene_ref][2]))
+    corr = posDF_sign.loc[:,"Corr"].tolist()
+    chroms = posDF_sign.loc[:,"chr"].tolist()
+    # Construct the hover text list
+    htext = [f"{n}<br>{m}<br>{c:3f}<br>{s}" for n, m, c, s in zip(posDF_sign.index, chroms, corr, nearGenes)]
+    print(posDF_sign.head())
+    print(posDF_sign.shape)
+    traceSign = go.Scatter3d(
+        x=posDF_sign.loc[:,"X"],
+        y=posDF_sign.loc[:,"Y"],
+        z=posDF_sign.loc[:,"Z"],
+        ids=posDF_sign.index.values,
+        name="Sign_Corr",
+        hoverinfo="text",
+        hovertext=htext,
+        mode="markers",
+        opacity=0.7,
+        marker=dict(size=4, color=corr, colorscale="RdYlBu_r", showscale=True),
+        showlegend=True)
+    traces.append(traceSign)
     # User specified trace
-    #userGenes = userGenes
+    if user_genes is not None:
+        with user_genes as fh:
+            userGenes = [l.rstrip() for l in fh]
+        posDF_user = pos_df.loc[userGenes,:]
+        nearGenes = []
+        for gene_ref in userGenes:
+            posDF_sign.loc[gene_ref, "Corr"] = correlation_dict[gene_ref][0]
+            # Append the list of selectes genes with a string
+            nearGenes.append('<br>'.join(correlation_dict[gene_ref][2]))
+        corr = posDF_user.loc[:,"Corr"].tolist()
+        chroms = posDF_user.loc[:,"chr"].tolist()
+        htext = [f"{n}<br>{m}<br>{c:3f}<br>{s}" for n, m, c, s in zip(posDF_user.index, chroms, corr, nearGenes)]
+        print(posDF_user.shape)
+        traceUser = go.Scatter3d(
+            x=posDF_user.loc[:,"X"],
+            y=posDF_user.loc[:,"Y"],
+            z=posDF_user.loc[:,"Z"],
+            name="User_Genes",
+            hoverinfo="text",
+            hovertext=htext,
+            mode="markers",
+            opacity=0.7,
+            marker=dict(size=4, color=corr, colorscale="RdYlBu_r", showscale=True),
+            showlegend=True)
+        traces.append(traceUser)
     return traces
 
 
+def get_significant_corr_genes(corSumsDict, coef=2):
+    """Calculate statistical tests and return a list of significantly correlated genes from a sums_of_correlations dictionary
+    """
+    # Compute the MAD for correlation sums
+    corrs = [i[0] for i in list(corSumsDict.values())]
+    mad = stats.median_abs_deviation(corrs)
+    med = np.median(corrs)
+    thresP = med + coef*mad
+    thresN = med - coef*mad
+    print(med, mad, thresP, thresN)
+    signGenes = []
+    for k, v in corSumsDict.items():
+        if v[0] > thresP or (v[0] <= thresN and v[0] <= 0):  # We need both conditions that's why we cannot use lambda
+            signGenes.append(k)
+    #print([(k, corSumsDict[k][0]) for k in signGenes])
+    return signGenes
 
 
 def visualise_3D_plotly(traces):
