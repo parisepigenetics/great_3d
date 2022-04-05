@@ -1,6 +1,7 @@
 # GREAT 3D
 [![GitHub Actions Build Status](https://github.com/cbouyio/parisepigenetics/workflows/CI/badge.svg)](https://github.com/parisepigenetics/great_3d/actions?query=workflow%3ACI)
 [![codecov](https://codecov.io/gh/REPLACE_WITH_OWNER_ACCOUNT/great_3D/branch/master/graph/badge.svg)](https://codecov.io/gh/REPLACE_WITH_OWNER_ACCOUNT/great_3D/branch/master)
+
 ## The Genome Regulatory Epigenetics Tools on 3D
 
 A software suite for multi-3D (epi)genomics
@@ -9,21 +10,20 @@ Suite of tools to analyse and visualise 3D genome architecture, transcription an
 
 ## Installation
 
-- [ ] Add a proper setup file.
-- [ ] Generate a proper python package structure.
+```python setup.py install --user```
 
 ## Usage
-To test the software with 1000 plasmodium genes run:
-```
-./trans3Dmap -p test/genePositions1000.tab -e test/geneExpression1000.tab
-```
-Then a Dash application will launch on your local machine a you can access it by pointing your browser at http://127.0.0.1:8050/
+To run the transcriptome 3D map you must have the 2 3D coordinates files ready (for the genome and for the genes) and then run:
 
+```great3D -g <genome_coordinates_table> -s <genes_coordinates_table> -e <gene_expression_table>```
+
+
+Then a Dash application will launch on your local machine a you can access it by pointing your browser at http://127.0.0.1:8050/
 
 
 ### Copyright
 
-Copyright (c) 2015-2021, Costas Bouyioukos, Universite de Paris et UMR7216
+Copyright (c) 2016-2022, Costas Bouyioukos, Universite Paris Cite et UMR7216
 
 
 #### Acknowledgements
