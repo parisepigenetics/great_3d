@@ -14,6 +14,15 @@ try:
 except:
     long_description = None
 
+class CleanCommand(Command):
+    """Custom clean command to tidy up the project root."""
+    user_options = []
+    def initialize_options(self):
+        pass
+    def finalize_options(self):
+        pass
+    def run(self):
+        os.system('rm -vrf ./__pycache__ ./build ./dist ./*.pyc ./*.pyo ./*.tgz ./*.egg-info')
 
 setup(
     # Self-descriptive entries which should always be present
