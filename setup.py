@@ -34,6 +34,8 @@ setup(
     long_description_content_type="text/markdown",
     version=versioneer.get_version(),
     cmdclass=versioneer.get_cmdclass(),
+    # Should make clean work with something like the following:
+    #cmdclass={'clean': CleanCommand,},  FIXME classes with the versioneer command
     license='LGPLv3',
     # Which Python importable modules should be included when your package is installed
     # Handled automatically by setuptools. Use 'exclude' to prevent some specific
