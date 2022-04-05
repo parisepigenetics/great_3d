@@ -4,4 +4,4 @@ include CODE_OF_CONDUCT.md
 include versioneer.py
 
 graft great_3d
-global-exclude *.py[cod] __pycache__ *.so
+global-exclude *.py[cod] __pycache__ *.soinclude great_3d/_version.py

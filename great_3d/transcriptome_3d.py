@@ -62,33 +62,29 @@ def sorting_distances(dist_df):
 def sum_correlation(dists_sorted, ge_file, no_genes, correlation_type):
     """Take the dictionnary of the closest genes, the gene expression file, the number of genes we need to compute correlation and the correlation type.
 
-    Return two dictionnaries: One wit the sum of correlations and one with the sum of absolute correlations for each gene
+    Return a complex dictionnaries containing: The sum of correlations, the sum of absolute correlations and the neighbouring genes for each gene.
     """
     # Read the GE file
     geDF = pd.read_csv(ge_file, sep="\t")
-    # Convert the GE data frame to a dictionary.
+    # Convert the GE data frame to a dictionary
     geD = geDF.T.to_dict("list")
     correlation_sums = {}
-    # FIXME If a gene has zero expression we give it zero correlation immediately.
-    # Here is the actual calculation.
+    # FIXME If a gene has zero expression we give it zero correlation immediately
+    # Here is the actual calculation
     for gene_ref, sorted_genes in dists_sorted.items():
         # TODO check if we gain time when we paralelise this for loop!
         selected_genes = list(sorted_genes[1 : no_genes].index)
         ref_GE = geD[gene_ref]
-        # Select the desired correlation.
+        # Select the desired correlation
         if correlation_type == "pearson":
-            #correlationA = [abs(pearsonr(ref_GE, geD[s])[0]) for s in selected_genes]
             correlation = [stats.pearsonr(ref_GE, geD[s])[0] for s in selected_genes]
         elif correlation_type == "kendall":
-            #correlationA = [abs(kendalltau(ref_GE, geD[s])[0]) for s in selected_genes]
             correlation = [stats.kendalltau(ref_GE, geD[s])[0] for s in selected_genes]
         elif correlation_type == "spearman":
-            #correlationA = [abs(spearmanr(ref_GE, geD[s])[0]) for s in selected_genes]
             correlation = [stats.spearmanr(ref_GE, geD[s])[0] for s in selected_genes]
         # NOTE Each method returns the p-value for a 2 taill-correlation test, so perhpas we can use it in a later analysis
         # TODO the function need to be modular in the sense that we can pass different correlation functions to it. Perhaps use decorators
         correlation = np.nan_to_num(correlation)
-        #correlationA = np.nan_to_num(correlationA)  # trick???
         sum_correlationA = sum(abs(correlation))
         sum_correlation = sum(correlation)
         correlation_sums[gene_ref] = [sum_correlation, sum_correlationA, selected_genes]
@@ -258,6 +254,7 @@ def visualise_3D_plotly(traces):
         margin=dict(l=1, r=1, b=1, t=50),
         legend=dict(yanchor="top", y=0.99, xanchor="left", x=0.1),
         modebar={"orientation": "h", "bgcolor": "salmon", "color": "white", "activecolor": "#9ED3CD"},
+        hoverlabel=dict(bgcolor='rgba(255,255,255,0.7)', font=dict(color='black')),
     )
     # Actual construction of the graph
     fig = go.Figure(data=traces, layout=layout)
