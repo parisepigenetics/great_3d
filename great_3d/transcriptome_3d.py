@@ -10,6 +10,8 @@ from scipy.spatial import distance_matrix
 from scipy import stats
 import plotly
 import plotly.graph_objs as go
+#TODO also consider numba
+#import numba
 
 import time
 import pprint  # for testing only!
@@ -53,6 +55,8 @@ def sorting_distances(dist_df):
     """Take a genes distance matrix (Pandas DataFrame), return a dictionary of gene names sorted by distance with each gene as a key.
     """
     sortedDict = {}
+    #FIXME perhaps a numpy array will work faster?
+    #FIXME look at some possible nymexpr implementation https://numexpr.readthedocs.io/projects/NumExpr3/en/latest/index.html
     for gene_name in dist_df.index:
         sortedDict[gene_name] = dist_df.loc[gene_name,:].sort_values()
     return sortedDict
