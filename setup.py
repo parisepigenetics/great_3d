@@ -1,5 +1,5 @@
 import sys
-from setuptools import setup, find_packages
+from setuptools import setup, find_packages, Command
 import versioneer
 
 short_description = "The GREAT 3D package for multi-3D (epi)genomics.".split("\n")[0]
@@ -65,5 +65,5 @@ setup(
         "Topic :: Scientific/Engineering :: Bio-Informatics",
     ],
     # Manual control if final package is compressible or not, set False to prevent the .egg from being made
-    zip_safe=False,
+    zip_safe = False,
 )
