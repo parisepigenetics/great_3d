@@ -73,10 +73,10 @@ fig = gtr3d.visualise_3D_plotly(traceGenome)
 # Simple Dash
 #TODO Enrich the Dash application with, controls (radio buttons, sliders, etc.), input files and progress bars!!!
 app = dash.Dash(__name__)
-plotTitle='P. falciparum 3D genome'
-app.layout = html.Div(children=[html.H1(children='GREAT 3D transcriptome map'),
-            html.Div(children=plotTitle),
-            dcc.Graph(id='dash_GREAT', figure=fig)])
+plotTitle = 'P. falciparum 3D genome'
+app.layout = html.Div(children = [html.H1(children='GREAT 3D transcriptome map'),
+                      html.Div(children = plotTitle),
+                      dcc.Graph(id = 'dash_GREAT', figure = fig)])
 if __name__ == '__main__':
     #app.run_server(host="0.0.0.0", port="8050")
     app.run_server()

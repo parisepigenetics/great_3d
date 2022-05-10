@@ -1,7 +1,9 @@
-"""The GREAT 3D package for multi-3D (epi)genomics."""
+"""The GREAT 3D suite for integrative multi-omics 3D epigenomics.
+"""
 
 # Add imports here
 from .transcriptome_3d import *
+from .great_pastis import *
 
 # Handle versioneer
 from ._version import get_versions
