@@ -3,7 +3,7 @@
 
 # Add imports here
 from .transcriptome_3d import *
-from .great_pastis import *
+from .great_pdb import *
 
 # Handle versioneer
 from ._version import get_versions
