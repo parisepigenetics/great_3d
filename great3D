@@ -6,29 +6,39 @@ Take a 3D gene positions file and a gene expression matrix, compute spatial corr
 """
 
 import argparse
+import pandas as pd
 import dash
 from dash import dcc
 from dash import html
 
 # Import package specific py_modules
+import great_3d.genome_3D_integration as grtGI
 import great_3d.transcriptome_3d as gtr3d
 
 
 # Command line arguments parsing
 parser = argparse.ArgumentParser(description="3D transcription map, main program")
 # Declare command line arguments
-parser.add_argument("-s", "--gene-starts",
+group = parser.add_mutually_exclusive_group(required=True)
+group.add_argument("-s", "--gene-starts",
     type=argparse.FileType("r"),
-    help="Path to the file containing genes, chromosome names and start site genomic position",
+    help="Path to the file containing genes, chromosome names and start site genomic coordinates",
+    dest="geneStarts",
+    metavar="genes_starts")
+group.add_argument("-t", "--gene-3Dcoords",
+    type=argparse.FileType("r"),
+    help="Path to the file containing the 3D coordinates of genes",
     dest="genePos",
-    metavar="gene_position_table")
+    metavar="genes_positions")
 parser.add_argument("-e", "--geneExpression-file",
     type=argparse.FileType("r"),
+    required=True,
     help="Path to the file containing the gene expression",
     dest="geneExpr",
     metavar="gene_expression_table")
 parser.add_argument("-g", "--genome-coordinates",
     type=argparse.FileType("r"),
+    required=True,
     help="Path to the file containing the genome coordinates in 3D",
     dest="genome",
     metavar="genome_coords")
@@ -55,8 +65,14 @@ parser.add_argument("-c", "--correlation-method",
 # Generate the options-arguments object
 args = parser.parse_args()
 
+# Calculate the gene 3D coordinates
+if args.genePos :
+    genePos = pd.read_table(args.genePos)
+elif args.geneStarts :
+    genePos = grtGI.compute_gene_coordinates(args.geneStarts, args.genome)
+
 # Calculate the distance matrix
-distanceMatrix = gtr3d.calculate_distance(args.genePos)
+distanceMatrix = gtr3d.calculate_distance(genePos)
 
 # Populate the dictionary of sorted distances.
 sortedDict = gtr3d.sorting_distances(distanceMatrix)
@@ -65,7 +81,7 @@ sortedDict = gtr3d.sorting_distances(distanceMatrix)
 sum_Corr = gtr3d.sum_correlation(sortedDict, args.geneExpr, args.nGenes, args.mCorr)
 
 # Load and visualise genome
-traceGenome = gtr3d.generate_genome_3D(args.genome, args.genePos, sum_Corr, args.userGenes)
+traceGenome = gtr3d.generate_genome_3D(args.genome, genePos, sum_Corr, args.userGenes)
 
 # 3D visualization with Plotly
 fig = gtr3d.visualise_3D_plotly(traceGenome)
@@ -73,10 +89,10 @@ fig = gtr3d.visualise_3D_plotly(traceGenome)
 # Simple Dash
 #TODO Enrich the Dash application with, controls (radio buttons, sliders, etc.), input files and progress bars!!!
 app = dash.Dash(__name__)
-plotTitle='P. falciparum 3D genome'
-app.layout = html.Div(children=[html.H1(children='GREAT 3D transcriptome map'),
-            html.Div(children=plotTitle),
-            dcc.Graph(id='dash_GREAT', figure=fig)])
+plotTitle = 'P. falciparum 3D genome'
+app.layout = html.Div(children = [html.H1(children='GREAT 3D transcriptome map'),
+                      html.Div(children = plotTitle),
+                      dcc.Graph(id = 'dash_GREAT', figure = fig)])
 if __name__ == '__main__':
     #app.run_server(host="0.0.0.0", port="8050")
     app.run_server()
