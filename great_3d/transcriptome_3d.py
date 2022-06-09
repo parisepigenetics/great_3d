@@ -163,7 +163,7 @@ def generate_genome_3D(genome_coords_file, position_df, correlation_dict, user_g
         hoverinfo="text",
         hovertext=htextA,
         mode="markers",
-        opacity=0.7,
+        opacity=0.5,
         marker=dict(size=4, color=corrA, colorscale="Hot_r", showscale=True),
         showlegend=True)
     traces.append(traceCorrA)
@@ -180,8 +180,6 @@ def generate_genome_3D(genome_coords_file, position_df, correlation_dict, user_g
     chroms = posDF_sign.loc[:,"chr"].tolist()
     # Construct the hover text list
     htext = [f"{n}<br>{m}<br>{c:3f}<br>{s}" for n, m, c, s in zip(posDF_sign.index, chroms, corr, nearGenes)]
-    print(posDF_sign.head())
-    print(posDF_sign.shape)
     traceSign = go.Scatter3d(
         x=posDF_sign.loc[:,"X"],
         y=posDF_sign.loc[:,"Y"],
@@ -191,8 +189,8 @@ def generate_genome_3D(genome_coords_file, position_df, correlation_dict, user_g
         hoverinfo="text",
         hovertext=htext,
         mode="markers",
-        opacity=0.7,
-        marker=dict(size=4, color=corr, colorscale="RdYlBu_r", showscale=True),
+        opacity=0.5,
+        marker=dict(size=7, color=corr, colorscale="RdYlBu_r", showscale=True),
         showlegend=True)
     traces.append(traceSign)
     # User specified trace
@@ -208,7 +206,6 @@ def generate_genome_3D(genome_coords_file, position_df, correlation_dict, user_g
         corr = posDF_user.loc[:,"Corr"].tolist()
         chroms = posDF_user.loc[:,"chr"].tolist()
         htext = [f"{n}<br>{m}<br>{c:3f}<br>{s}" for n, m, c, s in zip(posDF_user.index, chroms, corr, nearGenes)]
-        print(posDF_user.shape)
         traceUser = go.Scatter3d(
             x=posDF_user.loc[:,"X"],
             y=posDF_user.loc[:,"Y"],
@@ -217,7 +214,7 @@ def generate_genome_3D(genome_coords_file, position_df, correlation_dict, user_g
             hoverinfo="text",
             hovertext=htext,
             mode="markers",
-            opacity=0.7,
+            opacity=0.8,
             marker=dict(size=4, color=corr, colorscale="RdYlBu_r", showscale=True),
             showlegend=True)
         traces.append(traceUser)
@@ -233,12 +230,10 @@ def get_significant_corr_genes(corSumsDict, coef=2):
     med = np.median(corrs)
     thresP = med + coef*mad
     thresN = med - coef*mad
-    print(med, mad, thresP, thresN)
     signGenes = []
     for k, v in corSumsDict.items():
         if v[0] > thresP or (v[0] <= thresN and v[0] <= 0):  # We need both conditions that's why we cannot use lambda
             signGenes.append(k)
-    #print([(k, corSumsDict[k][0]) for k in signGenes])
     return signGenes
 
 
