@@ -25,7 +25,7 @@ group.add_argument("-s", "--gene-starts",
     help="Path to the file containing genes, chromosome names and start site genomic coordinates",
     dest="geneStarts",
     metavar="genes_starts")
-group.add_argument("-t", "--gene-3Dcoords",
+group.add_argument("-c", "--gene-3Dcoords",
     type=argparse.FileType("r"),
     help="Path to the file containing the 3D coordinates of genes",
     dest="genePos",
@@ -54,12 +54,18 @@ parser.add_argument("-n", "--nb-genes",
     default=10,
     dest="nGenes",
     metavar="noGenes")
-parser.add_argument("-c", "--correlation-method",
+parser.add_argument("-r", "--correlation-method",
     help="Define correlation method. (DEFAULT = 'pearson')",
     type=str,
     default="pearson",
     dest="mCorr",
     metavar="correlation_method")
+parser.add_argument("-t", "--title",
+    help="Title for the 3D plotly praph. (DEFAULT = '')",
+    type=str,
+    default="",
+    dest="title",
+    metavar="title")
 
 
 # Generate the options-arguments object
@@ -89,9 +95,8 @@ fig = gtr3d.visualise_3D_plotly(traceGenome)
 # Simple Dash
 #TODO Enrich the Dash application with, controls (radio buttons, sliders, etc.), input files and progress bars!!!
 app = dash.Dash(__name__)
-plotTitle = 'P. falciparum 3D genome'
 app.layout = html.Div(children = [html.H1(children='GREAT 3D transcriptome map'),
-                      html.Div(children = plotTitle),
+                      html.Div(children = args.title),
                       dcc.Graph(id = 'dash_GREAT', figure = fig)])
 if __name__ == '__main__':
     #app.run_server(host="0.0.0.0", port="8050")
