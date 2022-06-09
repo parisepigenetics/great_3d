@@ -33,15 +33,11 @@ def timing(f):
 
 ## Actual functions
 @timing
-def calculate_distance(position_file):
-    # TODO parallelise the calculation of the distance matrix.
-    """Take a genes position file, return the distance matrix as a pandas data frame.
+def calculate_distance(df):
+    """Take a genes position dataFrame, return the distance matrix as a pandas data frame.
     """
-    df = pd.read_csv(position_file, sep="\t")
-    position_file.seek(0)
-    del df["chr"]
     geneNames = df.index
-    da = df.to_numpy()
+    da = df[["X", "Y", "Z"]].to_numpy()
     ndarray = scipy.spatial.distance.pdist(da, 'seuclidean', V=None)
     matrix_uni = scipy.spatial.distance.squareform(ndarray)
     matrix_dist = pd.DataFrame(matrix_uni)
@@ -69,7 +65,7 @@ def sum_correlation(dists_sorted, ge_file, no_genes, correlation_type):
     Return a complex dictionnaries containing: The sum of correlations, the sum of absolute correlations and the neighbouring genes for each gene.
     """
     # Read the GE file
-    geDF = pd.read_csv(ge_file, sep="\t")
+    geDF = pd.read_table(ge_file)
     # Convert the GE data frame to a dictionary
     geD = geDF.T.to_dict("list")
     correlation_sums = {}
@@ -95,7 +91,7 @@ def sum_correlation(dists_sorted, ge_file, no_genes, correlation_type):
     return correlation_sums
 
 
-def generate_genome_3D(genome_coords_file, position_file, correlation_dict, user_genes):
+def generate_genome_3D(genome_coords_file, position_df, correlation_dict, user_genes):
     """Generate the trace for the 3D genome.
     Genome coordinates file should contain a column named "chr" with the different chromosome names
 
@@ -105,7 +101,7 @@ def generate_genome_3D(genome_coords_file, position_file, correlation_dict, user
     colors = plotly.colors.qualitative.Vivid + plotly.colors.qualitative.Safe
     # Build the genome contur trace
     #TODO look at the line 3D plots for a possible alternative https://plotly.com/python/3d-line-plots/
-    pos_dt = pd.read_csv(genome_coords_file, sep="\t")
+    pos_dt = pd.read_table(genome_coords_file)
     chroms = pos_dt.loc[:, "chr"].tolist()
     ## Generate the chromosome traces
     chromosomes = list(set(chroms))
@@ -126,7 +122,7 @@ def generate_genome_3D(genome_coords_file, position_file, correlation_dict, user
         traces.append(traceChr)
     ## Generate the genes traces
     nearGenes = []
-    pos_df = pd.read_csv(position_file, sep="\t")
+    pos_df = position_df
     for gene_ref in correlation_dict:
         pos_df.loc[gene_ref, "Corr"] = correlation_dict[gene_ref][0]
         pos_df.loc[gene_ref, "CorrA"] = correlation_dict[gene_ref][1]

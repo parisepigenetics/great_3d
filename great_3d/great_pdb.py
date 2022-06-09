@@ -28,14 +28,14 @@ def timing(f):
 
 
 # TODO under developemnt for parsing (IFF REQUIRED) .pdb genome structure files.
-parser = PDB.PDBParser()
-io = PDB.PDBIO()
-struct = parser.get_structure("chr3", "chr3.pdb")
-
-for model in struct:
-    for chain in model:
-        for residue in chain:
-            for atom in residue:
-                na =  atom.get_full_id()
-                x,y,z = atom.get_coord()
-                print(na[0], na[3][1], x, y, z)
+# parser = PDB.PDBParser()
+# io = PDB.PDBIO()
+# struct = parser.get_structure("chr3", "chr3.pdb")
+#
+# for model in struct:
+#     for chain in model:
+#         for residue in chain:
+#             for atom in residue:
+#                 na =  atom.get_full_id()
+#                 x,y,z = atom.get_coord()
+#                 print(na[0], na[3][1], x, y, z)
