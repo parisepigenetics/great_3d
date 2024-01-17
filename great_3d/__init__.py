@@ -1,5 +1,4 @@
-"""The GREAT 3D suite for integrative multi-omics 3D epigenomics.
-"""
+"""The GREAT 3D suite for integrative multi-omics 3D epigenomics."""
 
 # Add imports here
 from .transcriptome_3d import *
