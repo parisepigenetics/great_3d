@@ -1,5 +1,4 @@
-"""Module with the main classes/functions to interface PDB formt with GREAT.
-"""
+"""Module with the main classes/functions to interface PDB formt with GREAT."""
 
 import numpy as np
 import pandas as pd
