@@ -1,6 +1,6 @@
 import sys
 from setuptools import setup, find_packages, Command
-import versioneer
+#import versioneer
 
 short_description = "The GREAT 3D package for multi-3D (epi)genomics.".split("\n")[0]
 
@@ -32,8 +32,8 @@ setup(
     description=short_description,
     long_description=long_description,
     long_description_content_type="text/markdown",
-    version=versioneer.get_version(),
-    cmdclass=versioneer.get_cmdclass(),
+    #version=versioneer.get_version(),  # BROKEN on setuptools update
+    #cmdclass=versioneer.get_cmdclass(),
     # Should make clean work with something like the following:
     #cmdclass={'clean': CleanCommand,},  FIXME classes with the versioneer command
     license='LGPLv3',
@@ -44,7 +44,7 @@ setup(
     # Optional include package data to ship with your package
     # Customize MANIFEST.in if the general case does not suit your needs
     # Comment out this line to prevent the files from being packaged with your software
-    include_package_data=True,
+    include_package_data=True,  # FIXME Add a data package
     scripts=["great3D"],
     # Allows `setup.py test` to work correctly with pytest
     setup_requires=[] + pytest_runner,
