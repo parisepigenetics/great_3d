@@ -100,4 +100,4 @@ app.layout = html.Div(children=[html.H1(children='GREAT 3D transcriptome map'),
                       dcc.Graph(id='dash_GREAT', figure=fig)])
 if __name__ == '__main__':
     # app.run_server(host="0.0.0.0", port="8050")
-    app.run_server()
+    app.run_server(debug = True)
