@@ -70,7 +70,7 @@ def sum_correlation(dists_sorted, ge_file, no_genes, correlation_type):
     # Here is the actual calculation
     for gene_ref, sorted_genes in dists_sorted.items():
         # TODO check if we gain time when we paralelise this for loop!
-        selected_genes = list(sorted_genes[1: no_genes].index)
+        selected_genes = list(sorted_genes[1: no_genes+1].index)
         ref_GE = geD[gene_ref]
         # Select the desired correlation
         if correlation_type == "pearson":
@@ -96,7 +96,7 @@ def generate_genome_3D(genome_coords_file, position_df, correlation_dict, user_g
     Return: A list of all chromosome traces
     """
     traces = []
-    colors = plotly.colors.qualitative.Vivid + plotly.colors.qualitative.Safe
+    colours = plotly.colors.qualitative.Pastel + plotly.colors.qualitative.Safe + plotly.colors.qualitative.Vivid
     # Build the genome contur trace
     # TODO look at the line 3D plots for a possible alternative https://plotly.com/python/3d-line-plots/
     pos_dt = pd.read_table(genome_coords_file)
@@ -115,7 +115,7 @@ def generate_genome_3D(genome_coords_file, position_df, correlation_dict, user_g
             hoverinfo="text",
             mode="lines",
             opacity=0.5,
-            line=dict(width=3, color=colors[i]),
+            line=dict(width=2, color=colours[-(i+1)]),  # index from the end of colours
             showlegend=True)
         traces.append(traceChr)
     # Generate the genes traces
