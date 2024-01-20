@@ -65,20 +65,23 @@ def sum_correlation(dists_sorted, ge_file, no_genes, correlation_type):
     geDF = pd.read_table(ge_file)
     # Convert the GE data frame to a dictionary
     geD = geDF.T.to_dict("list")
-    correlation_sums = {}
     # FIXME If a gene has zero expression we give it zero correlation immediately
+    correlation_sums = {}
     # Here is the actual calculation
+    if correlation_type == "pearson":
+        corr_funct = stats.pearsonr
+    elif correlation_type == "kendall":
+        corr_funct = stats.spearmanr
+    elif correlation_type == "spearman":
+        corr_funct = stats.kendalltau
+    else:
+        raise NotImplementedError("Desired correlation function not impelmented.")
     for gene_ref, sorted_genes in dists_sorted.items():
         # TODO check if we gain time when we paralelise this for loop!
         selected_genes = list(sorted_genes[1: no_genes+1].index)
         ref_GE = geD[gene_ref]
-        # Select the desired correlation
-        if correlation_type == "pearson":
-            correlation = [stats.pearsonr(ref_GE, geD[s])[0] for s in selected_genes]
-        elif correlation_type == "kendall":
-            correlation = [stats.kendalltau(ref_GE, geD[s])[0] for s in selected_genes]
-        elif correlation_type == "spearman":
-            correlation = [stats.spearmanr(ref_GE, geD[s])[0] for s in selected_genes]
+        # Calculate the respective correlation
+        correlation = [corr_funct(ref_GE, geD[s])[0] for s in selected_genes]
         # NOTE Each method returns the p-value for a 2 taill-correlation test, so perhpas we can use it in a later analysis
         # TODO the function need to be modular in the sense that we can pass different correlation functions to it. Perhaps use decorators
         correlation = np.nan_to_num(correlation)
@@ -88,6 +91,7 @@ def sum_correlation(dists_sorted, ge_file, no_genes, correlation_type):
     return correlation_sums
 
 
+@timing
 def generate_genome_3D(genome_coords_file, position_df, correlation_dict, user_genes):
     """Generate the trace for the 3D genome.
 
@@ -169,8 +173,8 @@ def generate_genome_3D(genome_coords_file, position_df, correlation_dict, user_g
     pp = pprint.PrettyPrinter(indent=2)
     # Significant correlation trace
     signifGenes = get_significant_corr_genes(correlation_dict)
-    print("Significant Genes:\n")
-    pp.pprint(signifGenes)
+    #print("Significant Genes:\n")
+    #pp.pprint(signifGenes)  #FIXME remove these two comment printing lines
     posDF_sign = pos_df.loc[signifGenes, :]
     nearGenes = []
     for gene_ref in signifGenes:
@@ -198,9 +202,9 @@ def generate_genome_3D(genome_coords_file, position_df, correlation_dict, user_g
     if user_genes is not None:
         with user_genes as fh:
             userGenes = [l.rstrip() for l in fh]
-        print(f"Overlap Significant AND user:\n")
-        interSectGenes = list(set(signifGenes) & set(userGenes))
-        pp.pprint(interSectGenes)
+        #print(f"Overlap Significant AND user:\n")
+        #interSectGenes = list(set(signifGenes) & set(userGenes))  #FIXME use this to the dash app
+        #pp.pprint(interSectGenes)
         posDF_user = pos_df.loc[userGenes, :]
         nearGenes = []
         for gene_ref in userGenes:
