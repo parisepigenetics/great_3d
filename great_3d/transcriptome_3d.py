@@ -2,15 +2,12 @@
 
 import numpy as np
 import pandas as pd
-import scipy
-from multiprocessing import cpu_count, Pool, Process
-from functools import partial
-from scipy.spatial import distance_matrix
-from scipy import stats
+from scipy import stats, spatial
+#from multiprocessing import cpu_count, Pool, Process
+#from functools import partial
+#from scipy.spatial import distance_matrix
 import plotly
 import plotly.graph_objs as go
-# TODO also consider numba
-# import numba
 
 import time
 import pprint  # for testing only!
@@ -36,8 +33,8 @@ def calculate_distance(df):
     """Take a genes position dataFrame, return the distance matrix as a pandas data frame."""
     geneNames = df.index
     da = df[["X", "Y", "Z"]].to_numpy()
-    ndarray = scipy.spatial.distance.pdist(da, 'seuclidean', V=None)
-    matrix_uni = scipy.spatial.distance.squareform(ndarray)
+    ndarray = spatial.distance.pdist(da, 'seuclidean', V=None)
+    matrix_uni = spatial.distance.squareform(ndarray)
     matrix_dist = pd.DataFrame(matrix_uni)
     matrix_dist.columns = geneNames
     matrix_dist.index = geneNames
