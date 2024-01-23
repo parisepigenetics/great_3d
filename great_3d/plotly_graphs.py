@@ -5,7 +5,7 @@ import plotly.graph_objs as go
 import pandas as pd
 import numpy as np
 
-import pprint  # for testing only!
+# import pprint  # for testing only!
 from great_3d import timing
 from scipy import stats
 
@@ -72,6 +72,7 @@ def generate_genome_3D(genome_coords_file, position_df, correlation_dict, user_g
             showlegend=True)
         traces.append(traceChr)
     # Generate the genes traces
+    # FIXME find a way to deal with gene ovelarps (perhaps introduce a jitter as a quick fix.)
     nearGenes = []
     pos_df = position_df
     for gene_ref in correlation_dict:
@@ -121,9 +122,9 @@ def generate_genome_3D(genome_coords_file, position_df, correlation_dict, user_g
     # Extra traces
     # Significant correlation trace
     signifGenes = get_significant_corr_genes(correlation_dict)
-    #print("Significant Genes:\n")
-    #pp = pprint.PrettyPrinter(indent=2)
-    #pp.pprint(signifGenes)  #FIXME remove these two comment printing lines
+    # print("Significant Genes:\n")
+    # pp = pprint.PrettyPrinter(indent=2)
+    # pp.pprint(signifGenes)  #FIXME remove these two comment printing lines
     posDF_sign = pos_df.loc[signifGenes, :]
     nearGenes = []
     for gene_ref in signifGenes:
@@ -151,9 +152,9 @@ def generate_genome_3D(genome_coords_file, position_df, correlation_dict, user_g
     if user_genes is not None:
         with user_genes as fh:
             userGenes = [l.rstrip() for l in fh]
-        #print(f"Overlap Significant AND user:\n")
-        #interSectGenes = list(set(signifGenes) & set(userGenes))  #FIXME use this to the dash app
-        #pp.pprint(interSectGenes)
+        # print(f"Overlap Significant AND user:\n")
+        # interSectGenes = list(set(signifGenes) & set(userGenes))  #FIXME use this to the dash app
+        # pp.pprint(interSectGenes)
         posDF_user = pos_df.loc[userGenes, :]
         nearGenes = []
         for gene_ref in userGenes:
