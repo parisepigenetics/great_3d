@@ -3,12 +3,9 @@ analysis of transcriptoms."""
 
 import numpy as np
 import pandas as pd
-from scipy import stats, spatial
-# from multiprocessing import cpu_count, Pool, Process
-# from functools import partial
-# from scipy.spatial import distance_matrix
+from scipy import spatial
 
-import pprint  # for testing only!
+# import pprint  # for testing only!
 from great_3d import timing
 
 
@@ -26,10 +23,7 @@ def calculate_distance(df, distance_metric="seuclidean"):
     da = df[["X", "Y", "Z"]].to_numpy()
     ndarray = spatial.distance.pdist(da, distance_metric, V=None)  # Look at other available implementations from numpy
     matrix_uni = spatial.distance.squareform(ndarray)
-    matrix_dist = pd.DataFrame(matrix_uni)
-    matrix_dist.columns = geneNames
-    matrix_dist.index = geneNames
-    return matrix_dist
+    return pd.DataFrame(matrix_uni, index=geneNames, columns=geneNames)
 
 
 @timing
@@ -42,10 +36,18 @@ def sorting_distances(dist_df):
     - Returns:
     - A dictionary of gene names sorted by distance.
     """
+    sorted_indices = np.argsort(dist_df.values, axis=1)
+    sorted_distances = np.sort(dist_df.values, axis=1)
+    gene_names = dist_df.index
     return {
-        gene_name: dist_df.loc[gene_name, :].sort_values()
-        for gene_name in dist_df.index
+        gene_names[i]: pd.Series(sorted_distances[i], index=gene_names[sorted_indices[i]])
+        for i in range(len(gene_names))
     }
+    # The above implementation might be more complicated but it is 2x times faster
+    # return {
+    #     gene_name: dist_df.loc[gene_name, :].sort_values()
+    #     for gene_name in dist_df.index
+    # }
 
 
 @timing
@@ -65,23 +67,12 @@ def sum_correlation(dists_sorted, ge_file, no_genes, correlation_type):
     """
     # Read the GE file
     geDF = pd.read_table(ge_file)
-    # Convert the GE data frame to a dictionary
-    # geD = geDF.T.to_dict("list")
     # FIXME If a gene has zero expression we give it zero correlation immediately
-    correlation_sums = {}
-    # Here is the actual calculation
-    # if correlation_type == "pearson":
-    #     corr_funct = stats.pearsonr
-    # elif correlation_type == "spearman":
-    #     corr_funct = stats.spearmanr
-    # elif correlation_type == "kendall":
-    #     corr_funct = stats.kendalltau
-    # else:
-    #     raise NotImplementedError("Desired correlation function not yet impelmented.")
-    # Compute correlation matrix once
     geNumpy = geDF.to_numpy()
     corrMnp = np.corrcoef(geNumpy)
     corrMat = pd.DataFrame(corrMnp, index=geDF.index, columns=geDF.index)
+    correlation_sums = {}
+    # Compute correlation matrix once
     for gene_ref, sorted_genes in dists_sorted.items():
         # TODO check if we gain time when we paralelise this for loop!
         selected_genes = list(sorted_genes[1: no_genes+1].index)
