@@ -17,7 +17,8 @@ import pprint  # for testing only!
 @timing
 # TODO under developemnt for parsing (IFF REQUIRED) .pdb genome structure files.
 # TODO create a PDB genome class perhaps
-parser = PDB.PDBParser()
+def parse_PDB():
+    parser = PDB.PDBParser()
 # io = PDB.PDBIO()
 # struct = parser.get_structure("chr3", "chr3.pdb")
 #
