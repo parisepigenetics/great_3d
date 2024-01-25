@@ -9,6 +9,8 @@ import numpy as np
 from great_3d import timing
 from scipy import stats
 
+COLOURS = plotly.colors.qualitative.Pastel + plotly.colors.qualitative.Safe + plotly.colors.qualitative.Vivid
+
 
 def get_significant_corr_genes(corSumsDict, coef=2):
     """Calculate statistical tests and return a list of significantly
@@ -17,7 +19,7 @@ def get_significant_corr_genes(corSumsDict, coef=2):
     - `corSumsDict`: The dictionary of sums_of_correlations.
     - `coef`: Optional. The coefficient for determining significance (default: 2).
 
-    - Returns:
+    - Return:
     - A list of significantly correlated genes.
     """
     # Compute the MAD for correlation sums
@@ -34,24 +36,16 @@ def get_significant_corr_genes(corSumsDict, coef=2):
 
 
 @timing
-def generate_genome_3D(genome_coords_file, position_df, correlation_dict, user_genes):
-    """Generate the trace for the 3D genome.
+def visualise_genome_3D(genome_coords_file):
+    """Generate the contour for the 3D genome.
 
-    Genome coordinates file should contain a column named "chr" with the different chromosome names
-
+    Genome coordinates file must contain a column named "chr" with the different chromosome names
     - Args:
     - `genome_coords_file`: The file path to the genome coordinates file.
-    - `position_df`: The gene positions DataFrame.
-    - `correlation_dict`: The dictionary of gene/genes correlation values.
-    - `user_genes`: The user-specified genes.
-
-    - Returns:
-    - A list of all plotted traces.
+    - Return:
+    - The trace of the genoome 3D contour.
     """
-    traces = []
-    colours = plotly.colors.qualitative.Pastel + plotly.colors.qualitative.Safe + plotly.colors.qualitative.Vivid
     # Build the genome contur trace
-    # TODO look at the line 3D plots for a possible alternative https://plotly.com/python/3d-line-plots/
     pos_dt = pd.read_table(genome_coords_file)
     chroms = pos_dt.loc[:, "chr"].tolist()
     # Generate the chromosome traces
@@ -60,17 +54,42 @@ def generate_genome_3D(genome_coords_file, position_df, correlation_dict, user_g
         ch = chromosomes[i]
         # Take the dataframe slice that corresponds to each chromosome
         dfChrom = pos_dt[pos_dt["chr"] == ch]
+        midpoints = dfChrom.loc[:, "midpoint"]
+        htxt = [f"{m} bp" for m in midpoints]
         traceChr = go.Scatter3d(
             x=dfChrom.loc[:, "X"],
             y=dfChrom.loc[:, "Y"],
             z=dfChrom.loc[:, "Z"],
             name=ch,
+            line=dict(width=2, color=COLOURS[-(i+1)]),  # index from the end of colours
+            marker=dict(size=0.01, color=COLOURS[-(i+1)]),
             hoverinfo="text",
-            mode="lines",
-            opacity=0.5,
-            line=dict(width=2, color=colours[-(i+1)]),  # index from the end of colours
+            hovertext=htxt,
+            mode="lines+markers",
+            opacity=0.9,
             showlegend=True)
-        traces.append(traceChr)
+    return traceChr
+
+
+@timing
+def visualise_genes(pos_df):
+    X = pos_df.loc[:, "X"]
+    Y = pos_df.loc[:, "Y"]
+    Z = pos_df.loc[:, "Z"]
+    htext = [f"{n}<br>{s}" for n, s in zip(pos_df.index, pos_df.loc[:, "start"])]
+    return go.Scatter3d(x=X,
+                        y=Y,
+                        z=Z,
+                        ids=pos_df.index.values,
+                        mode="markers",
+                        opacity=0.6,
+                        marker=dict(size=5, color="lightseagreen", line=dict(width=3, color='darkmagenta')),
+                        hoverinfo='text',
+                        hovertext=htext,
+                        showlegend=False)
+    
+    
+def visulise_correlation(position_df, correlation_dict):
     # Generate the genes traces
     # FIXME find a way to deal with gene ovelarps (perhaps introduce a jitter as a quick fix.)
     nearGenes = []
@@ -100,10 +119,14 @@ def generate_genome_3D(genome_coords_file, position_df, correlation_dict, user_g
         hoverinfo="text",
         hovertext=htext,
         mode="markers",
-        opacity=0.7,
+        opacity=0.9,
         marker=dict(size=4, color=corr, colorscale="RdYlBu_r", showscale=True),
         showlegend=True)
     traces.append(traceCorr)
+
+    
+@timing
+def visualise_abs_correlation(position_df, correlation_dict):
     # Absolute correlation trace
     traceCorrA = go.Scatter3d(
         x=X,
@@ -118,8 +141,11 @@ def generate_genome_3D(genome_coords_file, position_df, correlation_dict, user_g
         opacity=0.5,
         marker=dict(size=4, color=corrA, colorscale="Hot_r", showscale=True),
         showlegend=True)
-    traces.append(traceCorrA)
-    # Extra traces
+    return traceCorrA
+    
+
+@timing
+def visulise_significant_genes():
     # Significant correlation trace
     signifGenes = get_significant_corr_genes(correlation_dict)
     # print("Significant Genes:\n")
@@ -147,7 +173,11 @@ def generate_genome_3D(genome_coords_file, position_df, correlation_dict, user_g
         opacity=0.5,
         marker=dict(size=7, color=corr, colorscale="RdYlBu_r", showscale=True),
         showlegend=True)
-    traces.append(traceSign)
+    return traceSign
+
+
+@timing
+def visualise_user_genes(user_genes):
     # User specified trace
     if user_genes is not None:
         with user_genes as fh:
@@ -175,5 +205,4 @@ def generate_genome_3D(genome_coords_file, position_df, correlation_dict, user_g
             opacity=0.8,
             marker=dict(size=4, color=corr, colorscale="RdYlBu_r", showscale=True),
             showlegend=True)
-        traces.append(traceUser)
-    return traces
+    return traceUser

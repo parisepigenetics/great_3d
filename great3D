@@ -55,12 +55,18 @@ parser.add_argument("-n", "--nb-genes",
                     default=10,
                     dest="nGenes",
                     metavar="noGenes")
-parser.add_argument("-r", "--correlation-method",
+parser.add_argument("-m", "--correlation-method",
                     help="Define correlation method. (DEFAULT = 'pearson')",
                     type=str,
                     default="pearson",
                     dest="mCorr",
                     metavar="correlation_method")
+parser.add_argument("-r", "--resolution",
+                    help="The Hi-C file bins size (resolution). (DEFAULT = 5000)",
+                    type=int,
+                    default=5000,
+                    dest="resolution",
+                    metavar="hicResolution")
 parser.add_argument("-t", "--title",
                     help="Title for the 3D plotly praph. (DEFAULT = '')",
                     type=str,
@@ -68,62 +74,41 @@ parser.add_argument("-t", "--title",
                     dest="title",
                     metavar="title")
 
-
-def visualise_genome_3D(traces):
-    """Render figure layout for Plotly.
-
-    - Args:
-    - `traces`: The list of traces.
-
-    - Returns:
-    - The Plotly figure.
-    """
-    # Set layout elements, size, margins, legend(s)
-    layout = go.Layout(
-        plot_bgcolor="#FFF",
-        autosize=False,
-        width=1600,
-        height=1200,
-        margin=dict(l=1, r=1, b=1, t=50),
-        legend=dict(yanchor="top", y=0.99, xanchor="left", x=0.1),
-        modebar={"orientation": "h", "bgcolor": "salmon", "color": "white", "activecolor": "#9ED3CD"},
-        hoverlabel=dict(bgcolor='rgba(255,255,255,0.7)', font=dict(color='black')),
-    )
-    # Actual construction of the graph
-    fig = go.Figure(data=traces, layout=layout)
-    # Remove the axis projections (i.e. spikes), do other things with axes and set the grid colour and lines.
-    fig.update_scenes(
-        xaxis_spikethickness=1,
-        yaxis_spikethickness=1,
-        zaxis_spikethickness=1,
-        xaxis_spikesides=False,
-        yaxis_spikesides=False,
-        zaxis_spikesides=False,
-        xaxis_spikecolor="#666",
-        yaxis_spikecolor="#666",
-        zaxis_spikecolor="#666",
-        xaxis_title="X",
-        yaxis_title="Y",
-        zaxis_title="Z",
-        xaxis_backgroundcolor="rgb(255, 255, 255)",
-        yaxis_backgroundcolor="rgb(255, 255, 255)",
-        zaxis_backgroundcolor="rgb(255, 255, 255)",
-        xaxis_gridcolor="#ccc",
-        yaxis_gridcolor="#ccc",
-        zaxis_gridcolor="#ccc",
-    )
-    return fig
-
-
 # Generate the options-arguments object
 args = parser.parse_args()
-# Calculate the gene 3D coordinates
+# Calculate if needed the gene 3D coordinates
 if args.genePos:
     genePos = pd.read_table(args.genePos)
 elif args.geneStarts:
-    genePos = grtGI.compute_gene_coordinates(args.geneStarts, args.genome)
+    genePos = grtGI.compute_gene_coordinates(args.geneStarts, args.genome, args.resolution)
 else:
     raise IOError("One of --gene-3Dcoords or --gene-starts arguments must be declared.")
+
+
+def visualise_3D(traces):
+    """Render figure layout for Plotly.
+    - Args:
+    - `traces`: The list of traces.
+    - Return:
+    - The Plotly figure.
+    """
+    # Set layout elements, size, margins, legend(s)
+    layout = go.Layout(plot_bgcolor="#FFF",
+                       autosize=False,
+                       width=1600,
+                       height=1200,
+                       margin=dict(l=1, r=1, b=1, t=50),
+                       legend=dict(yanchor="top", y=0.99, xanchor="left", x=0.1),
+                       modebar={"orientation": "h", "bgcolor": "salmon", "color": "white", "activecolor": "#9ED3CD"},
+                       hoverlabel=dict(bgcolor='rgba(255,255,255,0.7)', font=dict(color='black')))
+    # Construct the figure
+    fig = go.Figure(data=traces, layout=layout)
+    # Render axes invisible - cleaner graph.
+    fig.update_scenes(xaxis_visible=False,
+                      yaxis_visible=False,
+                      zaxis_visible=False)
+    return fig
+
 
 # Calculations:
 # Calculate the distance matrix
@@ -135,9 +120,11 @@ sum_Corr = greatCalc.sum_correlation(sortedDict, args.geneExpr, args.nGenes, arg
 
 # Visualisations:
 # Compute all visualisation tracks (traces)
-traceGenome = greatPlot.generate_genome_3D(args.genome, genePos, sum_Corr, args.userGenes)
+traceGenome = greatPlot.visualise_genome_3D(args.genome)
+traceGenes = greatPlot.visualise_genes(genePos)
+# genePos, sum_Corr, args.userGenes)
 # 3D visualization with Plotly
-fig = visualise_genome_3D(traceGenome)
+fig = visualise_3D([traceGenome, traceGenes])
 
 
 # FIXME just to practive tables visualisation remove that later perhaps
@@ -153,10 +140,10 @@ app.layout = html.Div([
     html.Hr(),
     html.H3(children=args.title),
     dcc.Graph(id='dash_GREAT', figure=fig),
-    html.Hr(),
-    # Just to practive with tables visualisation
-    html.H3(children="Expression Data"),
-    dash_table.DataTable(data=df.to_dict('records'), page_size=10)
+#    html.Hr(),
+#    # Just to practice with tables visualisation
+#    html.H3(children="Expression Data"),
+#    dash_table.DataTable(data=df.to_dict('records'), page_size=10)
 ])
 
 if __name__ == '__main__':
