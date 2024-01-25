@@ -16,7 +16,7 @@ def calculate_distance(df, distance_metric="seuclidean"):
     - `df`: The genes position dataFrame.
     - `distance_metric`: The numpy distance metric to use (default: "seuclidean").
 
-    - Returns:
+    - Return:
     - The distance matrix as a pandas data frame.
     """
     geneNames = df.index
@@ -33,7 +33,7 @@ def sorting_distances(dist_df):
     - Args:
     - `dist_df`: The genes distance matrix (Pandas DataFrame).
 
-    - Returns:
+    - Return:
     - A dictionary of gene names sorted by distance.
     """
     sorted_indices = np.argsort(dist_df.values, axis=1)
@@ -61,7 +61,7 @@ def sum_correlation(dists_sorted, ge_file, no_genes, correlation_type):
     - `no_genes`: The number of genes to compute correlation.
     - `correlation_type`: The correlation type.
 
-    - Returns:
+    - Return:
     - A complex dictionary containing the sum of correlations, the sum of
     absolute correlations, and the neighboring genes for each gene.
     """
