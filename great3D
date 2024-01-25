@@ -55,12 +55,18 @@ parser.add_argument("-n", "--nb-genes",
                     default=10,
                     dest="nGenes",
                     metavar="noGenes")
-parser.add_argument("-r", "--correlation-method",
+parser.add_argument("-m", "--correlation-method",
                     help="Define correlation method. (DEFAULT = 'pearson')",
                     type=str,
                     default="pearson",
                     dest="mCorr",
                     metavar="correlation_method")
+parser.add_argument("-r", "--resolution",
+                    help="The Hi-C file bins size (resolution). (DEFAULT = 5000)",
+                    type=int,
+                    default=5000,
+                    dest="resolution",
+                    metavar="hicResolution")
 parser.add_argument("-t", "--title",
                     help="Title for the 3D plotly praph. (DEFAULT = '')",
                     type=str,
@@ -74,7 +80,7 @@ args = parser.parse_args()
 if args.genePos:
     genePos = pd.read_table(args.genePos)
 elif args.geneStarts:
-    genePos = grtGI.compute_gene_coordinates(args.geneStarts, args.genome)
+    genePos = grtGI.compute_gene_coordinates(args.geneStarts, args.genome, args.resolution)
 else:
     raise IOError("One of --gene-3Dcoords or --gene-starts arguments must be declared.")
 
@@ -115,9 +121,10 @@ sum_Corr = greatCalc.sum_correlation(sortedDict, args.geneExpr, args.nGenes, arg
 # Visualisations:
 # Compute all visualisation tracks (traces)
 traceGenome = greatPlot.visualise_genome_3D(args.genome)
-# , genePos, sum_Corr, args.userGenes)
+traceGenes = greatPlot.visualise_genes(genePos)
+# genePos, sum_Corr, args.userGenes)
 # 3D visualization with Plotly
-fig = visualise_3D([traceGenome])
+fig = visualise_3D([traceGenome, traceGenes])
 
 
 # FIXME just to practive tables visualisation remove that later perhaps
