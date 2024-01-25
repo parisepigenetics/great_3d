@@ -1,7 +1,7 @@
 """Module for generating and visualizing 3D genome plots using Plotly."""
 
 import plotly
-import plotly.graph_objs as go
+import plotly.graph_objects as go
 import pandas as pd
 import numpy as np
 
@@ -177,49 +177,3 @@ def generate_genome_3D(genome_coords_file, position_df, correlation_dict, user_g
             showlegend=True)
         traces.append(traceUser)
     return traces
-
-
-def visualise_3D_plotly(traces):
-    """Render figure laout for Plotly.
-
-    - Args:
-    - `traces`: The list of traces.
-
-    - Returns:
-    - The Plotly figure.
-    """
-    # Set layout elements, size, margins, legend(s)
-    layout = go.Layout(
-        plot_bgcolor="#FFF",
-        autosize=False,
-        width=1600,
-        height=1200,
-        margin=dict(l=1, r=1, b=1, t=50),
-        legend=dict(yanchor="top", y=0.99, xanchor="left", x=0.1),
-        modebar={"orientation": "h", "bgcolor": "salmon", "color": "white", "activecolor": "#9ED3CD"},
-        hoverlabel=dict(bgcolor='rgba(255,255,255,0.7)', font=dict(color='black')),
-    )
-    # Actual construction of the graph
-    fig = go.Figure(data=traces, layout=layout)
-    # Remove the axis projections (i.e. spikes), do other things with axes and set the grid colour and lines.
-    fig.update_scenes(
-        xaxis_spikethickness=1,
-        yaxis_spikethickness=1,
-        zaxis_spikethickness=1,
-        xaxis_spikesides=False,
-        yaxis_spikesides=False,
-        zaxis_spikesides=False,
-        xaxis_spikecolor="#666",
-        yaxis_spikecolor="#666",
-        zaxis_spikecolor="#666",
-        xaxis_title="X",
-        yaxis_title="Y",
-        zaxis_title="Z",
-        xaxis_backgroundcolor="rgb(255, 255, 255)",
-        yaxis_backgroundcolor="rgb(255, 255, 255)",
-        zaxis_backgroundcolor="rgb(255, 255, 255)",
-        xaxis_gridcolor="#ccc",
-        yaxis_gridcolor="#ccc",
-        zaxis_gridcolor="#ccc",
-    )
-    return fig
