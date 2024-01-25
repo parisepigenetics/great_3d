@@ -8,11 +8,11 @@ import pandas as pd
 
 
 def compute_gene_coordinates(pos_file_Genes, pos_file_Genome3D, proximity=5000):
-    """Get two tab files, one with the genenames andtheir respective start sites and one with the 3D genome coordinates (as midpoints of fragments of fixed length i.e. resoluton).
+    """Get two tab files, one with the genenames and their respective start sites and one with the 3D genome coordinates (as midpoints of fragments of fixed length i.e. resoluton).
 
     Return a dataFrame with the 3D coordinates of genes.
     """
-    # TODO in the first run the closest known midpoint will be considered, however n later versions amore proper geometric clculation of the 3D position of a gene must be considered.
+    # TODO in the first run the closest known midpoint will be considered, however on later versions a more proper geometric calculation of the 3D position of a gene must be considered.
     dfGenome = pd.read_table(pos_file_Genome3D)
     dfGenes = pd.read_table(pos_file_Genes)
     # First simple approach, the gene is assigned to its closest bin median point.
