@@ -43,4 +43,7 @@ def compute_gene_coordinates(pos_file_Genes, pos_file_Genome3D, proximity=5000):
     # Generate the new data frame and reurn it
     df = pd.DataFrame({"chr": chr, "X": Xs, "Y": Ys, "Z": Zs})
     df.index = names
+    # Reset the files as they needed for later computations
+    pos_file_Genome3D.seek(0)
+    pos_file_Genes.seek(0)
     return df
