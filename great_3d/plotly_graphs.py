@@ -66,14 +66,27 @@ def visualise_genome_3D(genome_coords_file):
             hoverinfo="text",
             hovertext=htxt,
             mode="lines+markers",
-            opacity=0.5,
+            opacity=0.9,
             showlegend=True)
     return traceChr
 
 
 @timing
-def visualise_genes(position_df):
-    pass
+def visualise_genes(pos_df):
+    X = pos_df.loc[:, "X"]
+    Y = pos_df.loc[:, "Y"]
+    Z = pos_df.loc[:, "Z"]
+    htext = [f"{n}<br>{s}" for n, s in zip(pos_df.index, pos_df.loc[:, "start"])]
+    return go.Scatter3d(x=X,
+                        y=Y,
+                        z=Z,
+                        ids=pos_df.index.values,
+                        mode="markers",
+                        opacity=0.6,
+                        marker=dict(size=5, color="lightseagreen", line=dict(width=3, color='darkmagenta')),
+                        hoverinfo='text',
+                        hovertext=htext,
+                        showlegend=False)
     
     
 def visulise_correlation(position_df, correlation_dict):
@@ -106,7 +119,7 @@ def visulise_correlation(position_df, correlation_dict):
         hoverinfo="text",
         hovertext=htext,
         mode="markers",
-        opacity=0.7,
+        opacity=0.9,
         marker=dict(size=4, color=corr, colorscale="RdYlBu_r", showscale=True),
         showlegend=True)
     traces.append(traceCorr)
