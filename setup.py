@@ -1,4 +1,5 @@
 import sys
+import os
 from setuptools import setup, find_packages, Command
 #import versioneer
 
@@ -11,18 +12,23 @@ pytest_runner = ['pytest-runner'] if needs_pytest else []
 try:
     with open("README.md", "r") as handle:
         long_description = handle.read()
-except:
+except Exception:
     long_description = None
+
 
 class CleanCommand(Command):
     """Custom clean command to tidy up the project root."""
     user_options = []
+    
     def initialize_options(self):
         pass
+    
     def finalize_options(self):
         pass
+    
     def run(self):
         os.system('rm -vrf ./__pycache__ ./build ./dist ./*.pyc ./*.pyo ./*.tgz ./*.egg-info')
+
 
 setup(
     # Self-descriptive entries which should always be present
@@ -65,5 +71,5 @@ setup(
         "Topic :: Scientific/Engineering :: Bio-Informatics",
     ],
     # Manual control if final package is compressible or not, set False to prevent the .egg from being made
-    zip_safe = False,
+    zip_safe=False,
 )
