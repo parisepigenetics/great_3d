@@ -28,11 +28,9 @@ def get_significant_corr_genes(corSumsDict, coef=2):
     med = np.median(corrs)
     thresP = med + coef*mad
     thresN = med - coef*mad
-    return [
-        k
-        for k, v in corSumsDict.items()
-        if v[0] > thresP or (v[0] <= thresN and v[0] <= 0)
-    ]
+    return [k
+            for k, v in corSumsDict.items()
+            if v[0] > thresP or (v[0] <= thresN and v[0] <= 0)]
 
 
 @timing
@@ -55,18 +53,18 @@ def visualise_genome_3D(genome_coords_file):
         # Take the dataframe slice that corresponds to each chromosome
         dfChrom = pos_dt[pos_dt["chr"] == ch]
         midpoints = dfChrom.loc[:, "midpoint"]
-        htxt = [f"{m} bp" for m in midpoints]
+        htxt = [f"{m:,} bp" for m in midpoints]
         traceChr = go.Scatter3d(
             x=dfChrom.loc[:, "X"],
             y=dfChrom.loc[:, "Y"],
             z=dfChrom.loc[:, "Z"],
             name=ch,
-            line=dict(width=2, color=COLOURS[-(i+1)]),  # index from the end of colours
-            marker=dict(size=0.01, color=COLOURS[-(i+1)]),
+            line=dict(width=5, color=COLOURS[-(i+1)]),  # index from the end of colours
+            marker=dict(size=0.001, color=COLOURS[-(i+1)]),
             hoverinfo="text",
             hovertext=htxt,
             mode="lines+markers",
-            opacity=0.9,
+            opacity=0.55,
             showlegend=True)
     return traceChr
 
@@ -76,7 +74,7 @@ def visualise_genes(pos_df):
     X = pos_df.loc[:, "X"]
     Y = pos_df.loc[:, "Y"]
     Z = pos_df.loc[:, "Z"]
-    htext = [f"{n}<br>{s}" for n, s in zip(pos_df.index, pos_df.loc[:, "start"])]
+    htxt = [f"{n}<br>{s:,}" for n, s in zip(pos_df.index, pos_df.loc[:, "start"])]
     return go.Scatter3d(x=X,
                         y=Y,
                         z=Z,
@@ -85,10 +83,10 @@ def visualise_genes(pos_df):
                         opacity=0.6,
                         marker=dict(size=5, color="lightseagreen", line=dict(width=3, color='darkmagenta')),
                         hoverinfo='text',
-                        hovertext=htext,
+                        hovertext=htxt,
                         showlegend=False)
-    
-    
+
+
 def visulise_correlation(position_df, correlation_dict):
     # Generate the genes traces
     # FIXME find a way to deal with gene ovelarps (perhaps introduce a jitter as a quick fix.)
