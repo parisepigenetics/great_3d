@@ -136,18 +136,11 @@ args.geneExpr.seek(0)
 with args.geneExpr as fh:
     df = pd.read_table(fh)
 
-<<<<<<< HEAD
-# Dash app
-external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
-app = Dash("GREAT3d", external_stylesheets=external_stylesheets)
 
-app.layout = html.Div([ 
-=======
 # Dash application
 # TODO Enrich the Dash application with, controls (radio buttons, sliders, etc.), input files and progress bars!!!
 app = Dash("GREAT3D")
 app.layout = html.Div([
->>>>>>> 690c7b1af352ebe75093834392ebe5bac92e60ea
     html.H1(children='GREAT 3D transcriptome map'),
     html.Hr(),
     html.H3(children=args.title),
