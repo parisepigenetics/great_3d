@@ -7,13 +7,8 @@ Take a 3D gene positions file and a gene expression matrix, compute spatial corr
 
 import argparse
 import pandas as pd
-<<<<<<< HEAD
-from dash import Dash, dcc, html, dash_table
-=======
 import plotly.graph_objects as go
 from dash import Dash, dcc, html, dash_table
-
->>>>>>> 690c7b1af352ebe75093834392ebe5bac92e60ea
 
 # Import package specific py_modules
 import great_3d.genome_3D_integration as grtGI
