@@ -9,6 +9,7 @@ import argparse
 import pandas as pd
 import plotly.graph_objects as go
 from dash import Dash, dcc, html, dash_table
+import dash_bootstrap_components as dbc
 
 # Import package specific py_modules
 import great_3d.genome_3D_integration as grtGI
@@ -83,6 +84,8 @@ elif args.geneStarts:
 else:
     raise IOError("One of --gene-3Dcoords or --gene-starts arguments must be declared.")
 
+GRAPH_WIDTH = 1280  # In pixels
+GRAPH_HEIGHT = 1280
 
 def visualise_3D(traces):
     """Render figure layout for Plotly.
@@ -94,18 +97,27 @@ def visualise_3D(traces):
     # Set layout elements, size, margins, legend(s)
     layout = go.Layout(plot_bgcolor="#FFF",
                        autosize=False,
-                       width=1600,
-                       height=1200,
-                       margin=dict(l=1, r=1, b=1, t=50),
+                       width=GRAPH_WIDTH,
+                       height=GRAPH_HEIGHT,
+                       margin=dict(l=1, r=1, b=1, t=1),
                        legend=dict(yanchor="top", y=0.99, xanchor="left", x=0.1),
                        modebar={"orientation": "h", "bgcolor": "salmon", "color": "white", "activecolor": "#9ED3CD"},
-                       hoverlabel=dict(bgcolor='rgba(255,255,255,0.7)', font=dict(color='black')))
+                       hoverlabel=dict(bgcolor='rgba(255,255,255,0.7)', font=dict(color='black')),
+                       modebar_add=['drawline',
+                                    'drawopenpath',
+                                    'drawclosedpath',
+                                    'drawcircle',
+                                    'drawrect',
+                                    'eraseshape'
+                                    ]
+                       )
     # Construct the figure
     fig = go.Figure(data=traces, layout=layout)
     # Render axes invisible - cleaner graph.
     fig.update_scenes(xaxis_visible=False,
                       yaxis_visible=False,
-                      zaxis_visible=False)
+                      zaxis_visible=False
+                      )
     return fig
 
 
@@ -126,27 +138,62 @@ traceGenes = greatPlot.visualise_genes(genePos)
 fig = visualise_3D([traceGenome, traceGenes])
 
 
-# FIXME just to practive tables visualisation remove that later perhaps
+# FIXME just to practice tables visualisation remove that later perhaps
 args.geneExpr.seek(0)
 with args.geneExpr as fh:
     df = pd.read_table(fh)
+df.reset_index(inplace=True)
+df.rename(columns={"index":"Gene Name"}, inplace=True)
 
 
 # Dash application
-# TODO Enrich the Dash application with, controls (radio buttons, sliders, etc.), input files and progress bars!!!
-app = Dash("GREAT3D")
+# TODO Enrich the Dash application with, controls (radio buttons, sliders, etc.), input files and proress bars!!!
+app = Dash("GREAT3D", external_stylesheets=[dbc.themes.BOOTSTRAP])
 app.layout = html.Div([
-    html.H1(children='GREAT 3D transcriptome map'),
-    html.Hr(),
-    html.H3(children=args.title),
-    dcc.Graph(id='dash_GREAT', figure=fig),
-#    html.Hr(),
-#    # Just to practice with tables visualisation
-#    html.H3(children="Expression Data"),
-#    dash_table.DataTable(data=df.to_dict('records'), page_size=10)
+        html.H3(html.B("GREAT 3D Transcriptome Map")),
+        html.H2(args.title, style={'textAlign': 'center'}),
+        html.Hr(),
+        dbc.Row([
+            dbc.Col(html.Div([
+                dcc.Graph(id='dash_GREAT', figure=fig)
+                ]),
+                    width=9),
+            dbc.Col(html.Div([
+                html.H3("Options"),
+                html.Hr(),
+                html.Label('Tracks:', style={'paddingTop': '2rem', 'display': 'inline-block'}),
+                dcc.Checklist(
+                    id='input_track',
+                    options=[
+                        {'label': 'Genes', 'value': 'genes'},
+                        {'label': 'Correlation', 'value': 'corr'},
+                        {'label': '|Correlation|', 'value': 'absCorr'}
+                        ],
+                    value=['genes', 'corr', 'absCorr'])
+                ]), 
+                    width=3)
+            ]),
+        html.Hr(),
+        html.H3("Expression Data"),
+        dash_table.DataTable(
+            data=df.to_dict('records'),
+            page_size=20,
+            id='expression_data',
+            columns=[{"name": i, "id": i} for i in df.columns],
+            style_table={'overflow': 'scroll', 'height': 800},
+            style_header={'font_size': '14px', 'backgroundColor': '#305D91', 'padding': '15px', 'color': '#FFFFFF'},
+            style_cell={'textAlign': 'center', 'minWidth': 60, 'maxWidth': 400, 'width': 90, 'font_size': '12px', 'whiteSpace': 'normal', 'height': 'auto', 'padding': '10px'},
+            filter_action="native",      # allow filtering of data by user ('native') or not ('none')
+            sort_action="native",        # enables data to be sorted per-column by user or not ('none')
+            sort_mode="single",          # sort across 'multi' or 'single' columns
+            column_selectable="single",  # allow users to select 'multi' or 'single' columns
+            row_selectable="multi",      # allow users to select 'multi' or 'single' rows
+            selected_columns=[],         # ids of columns that user selects
+            selected_rows=[],            # indices of rows that user selects
+            fill_width=False,
+            page_action="native")
 ])
 
-# TODO Enrich the Dash application with, controls (radio buttons, sliders, etc.), input files and progress bars!!!
 # TODO here will go the callbacks
 
 if __name__ == '__main__':
