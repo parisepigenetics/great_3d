@@ -10,7 +10,7 @@ import pandas as pd
 
 def compute_gene_coordinates(dfGenes, dfGenome, resolution):
     """Get two tab files, one with the gene names and their respective start sites and one with the 3D genome coordinates (as midpoints of fragments of fixed length i.e. resolution).
-    
+
     - Args:
     - `starts_sites_Genes`: A gene names and start sites data frame.
     - `dfGenome3D`: The 3D genome coordinates data frame.
