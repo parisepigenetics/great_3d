@@ -1,5 +1,4 @@
-"""Module with the main classes/functions for the base calculations of the 3D
-analysis of transcriptoms."""
+"""Main classes/functions for the base calculations of the 3D analysis of transcriptoms."""
 
 import numpy as np
 import pandas as pd
@@ -12,6 +11,7 @@ from great_3d import timing
 @timing
 def calculate_distance(df, distance_metric="seuclidean"):
     """Take a genes position dataFrame, return the distance matrix as a pandas data frame.
+
     - Args:
     - `df`: The genes position dataFrame.
     - `distance_metric`: The numpy distance metric to use (default: "seuclidean").
@@ -19,17 +19,18 @@ def calculate_distance(df, distance_metric="seuclidean"):
     - Return:
     - The distance matrix as a pandas data frame.
     """
-    geneNames = df.index
+    gene_names = df.index
     da = df[["X", "Y", "Z"]].to_numpy()
     ndarray = spatial.distance.pdist(da, distance_metric, V=None)  # Look at other available implementations from numpy
     matrix_uni = spatial.distance.squareform(ndarray)
-    return pd.DataFrame(matrix_uni, index=geneNames, columns=geneNames)
+    return pd.DataFrame(matrix_uni, index=gene_names, columns=gene_names)
 
 
 @timing
 def sorting_distances(dist_df):
     """Take a genes distance matrix (Pandas DataFrame), return a dictionary of
     gene names sorted by distance with each gene as a key.
+
     - Args:
     - `dist_df`: The genes distance matrix (Pandas DataFrame).
 
