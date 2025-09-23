@@ -5,10 +5,14 @@
 Take a 3D gene positions file and a gene expression matrix, compute spatial correlation and visualise an interactive 3D graph of the spatial gene expression correlation
 """
 
+import io
+import base64
+import datetime
 import argparse
+
 import pandas as pd
 import plotly.graph_objects as go
-from dash import Dash, dcc, html, dash_table, Input, Output, callback
+from dash import Dash, dcc, html, dash_table, Input, Output, State, callback
 import dash_bootstrap_components as dbc
 
 # Import package specific py_modules
@@ -16,6 +20,8 @@ import great_3d.genome_3D_integration as greatGI
 import great_3d.base_calulations as greatCalc
 import great_3d.plotly_graphs as greatPlot
 
+# Global
+external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
 
 # Command line arguments parsing
 parser = argparse.ArgumentParser(description="3D transcription map, main program")
@@ -43,12 +49,6 @@ parser.add_argument("-g", "--genome-coordinates",
                     help="Path to the file containing the genome coordinates in 3D",
                     dest="genome",
                     metavar="genome_coords")
-parser.add_argument("-u", "--user-genes",
-                    type=argparse.FileType("r"),
-                    help="Path to the file with the user genes of interest",
-                    default=None,
-                    dest="userGenes",
-                    metavar="genes_interest")
 parser.add_argument("-n", "--nb-genes",
                     help="Number of neighbouring genes. (DEFAULT = 10)",
                     type=int,
@@ -68,7 +68,7 @@ parser.add_argument("-r", "--resolution",
                     dest="resolution",
                     metavar="hicResolution")
 parser.add_argument("-t", "--title",
-                    help="Title for the 3D plotly praph. (DEFAULT = '')",
+                    help="Title for the 3D plotly graph. (DEFAULT = '')",
                     type=str,
                     default="",
                     dest="title",
@@ -84,8 +84,6 @@ with args.geneExpr as fh:
     geneExpr = pd.read_table(fh)
 with args.geneStarts as fh:
     geneStarts = pd.read_table(fh)
-with args.userGenes as fh:
-    userGenes = [l.rstrip() for l in fh]
 
 # Calculate if needed the gene 3D coordinates
 if args.genePos:
@@ -96,12 +94,13 @@ else:
     raise IOError("One of --gene-3Dcoords or --gene-starts arguments must be declared.")
 
 
-GRAPH_WIDTH = 1200  # In pixels
-GRAPH_HEIGHT = 1200
+GRAPH_WIDTH = 1024  # In pixels
+GRAPH_HEIGHT = 1024
 
 
 def visualise_3D(traces):
     """Render figure layout for Plotly.
+
     - Args:
     - `traces`: The list of traces.
     - Return:
@@ -146,24 +145,22 @@ sum_Corr = greatCalc.sum_correlation(sortedDict, geneExpr, args.nGenes)  # TODO:
 
 # FIXME just to practice tables visualisation remove that later perhaps
 geneExpr.reset_index(inplace=True)
-geneExpr.rename(columns={"index":"Gene Name"}, inplace=True)
+geneExpr.rename(columns={"index": "Gene Name"}, inplace=True)
 
 
 # Dash application
-# TODO Enrich the Dash application with, controls (radio buttons, sliders, etc.), input files and proress bars!!!
-app = Dash("GREAT3D", external_stylesheets=[dbc.themes.BOOTSTRAP])
+# TODO Enrich the Dash application with input files and progress bars!!!
+app = Dash("GREAT3D", external_stylesheets=external_stylesheets)  # external_stylesheets=[dbc.themes.BOOTSTRAP])
 app.layout = html.Div([
-    html.H3(html.B("GREAT 3D Transcriptome Map")),
-    html.H2(args.title, style={'textAlign': 'center'}),
+    html.H3(html.B("GREAT Transcription 3D Map")),
     html.Hr(),
+    html.H2(args.title, style={'textAlign': 'center'}),
     dbc.Row([
         dbc.Col(html.Div([
             dcc.Graph(id='dash_GREAT')
-            ]),
-                width=9),
+            ]), width=9),
         dbc.Col(html.Div([
             html.H3("Options"),
-            html.Hr(),
             html.P('Select correlation:', style={'paddingTop': '2rem', 'display': 'inline-block'}),
             dcc.Checklist(id='correl_track', value=['no_correl'],
                           options=[{'label': 'Correlation    ', 'value': 'corr'},
@@ -177,11 +174,21 @@ app.layout = html.Div([
                 options=[{'label': ' Genome', 'value': 'genome'},
                          {'label': ' Genes', 'value': 'genes'},
                          {'label': ' Significant genes', 'value': 'signGenes'},
-                         {'label': ' User Genes', 'value': 'usrGenes'}
                          ],
+                ),
+            dcc.Upload(
+                id='user-genes',
+                children=html.Div(['Drag and Drop a users genes file or ', html.A('Select File')],
+                                  style={'width': '20%',
+                                         'height': '50px',
+                                         'lineHeight': '50px',
+                                         'borderWidth': '1px',
+                                         'borderStyle': 'dashed',
+                                         'borderRadius': '5px',
+                                         'textAlign': 'center'
+                                         })
                 )
-            ]),
-                width=3)
+            ]), width=3)
         ]),
     html.Hr(),
     html.H3("Expression data table"),
@@ -205,10 +212,34 @@ app.layout = html.Div([
 ])
 
 
+def parse_contents(contents, filename, date):
+    """Parse and pre-process the input genes file."""
+    content_type, content_string = contents.split(',')
+    decoded = base64.b64decode(content_string)
+    try:
+        print("GHDSGDGDJKGHDHKJHDKHD")
+        print(io.StringIO(decoded.decode('utf-8')))
+    except Exception as e:
+        print(e)
+        return html.Div(['There was an error processing this file.'])
+    return html.Div([
+        html.H5(filename),
+        html.Hr(),  # horizontal line
+        # For debugging, display the raw contents provided by the web browser
+        html.Div('Raw Content'),
+        html.Pre(contents[:200] + '...', style={
+            'whiteSpace': 'pre-wrap',
+            'wordBreak': 'break-all'
+        })
+    ])
+
+
 @callback(
     Output('dash_GREAT', 'figure'),
     [Input('genome_track', 'value'),
-     Input('correl_track', 'value')]
+     Input('correl_track', 'value')],
+    [State('upload-data', 'filename'),
+     State('upload-data', 'last_modified')]
 )
 def update_tracks(genome_track, correl_track):
     # Visualisations:
